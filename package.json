@@ -23,7 +23,9 @@
     "start": "react-scripts start",
     "build": "GENERATE_SOURCEMAP=false react-app-rewired build --max_old_space_size=4096",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "lint": "eslint src/**/*.ts src/**/*.tsx",
+    "lint:fix": "eslint --fix src/**/*.ts src/**/*.tsx"
   },
   "eslintConfig": {
     "extends": [

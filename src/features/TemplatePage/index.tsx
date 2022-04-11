@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import MonacoEditor from "react-monaco-editor";
 import TemplateSelect from "./components/TemplateSelect";
 import TemplateFile from "./model/TemplateFile";
@@ -124,7 +123,7 @@ function TemplatePage() {
             <p className="subtitle">
               No saving required, everything is saved instantly! You can always
               revert the template changes in the{" "}
-              <Link to="/upload?view=template">settings</Link>. Adding /
+              <a href="https://2anki.net/upload?view=template">settings</a>. Adding /
               removing fields and preview is coming soon.
             </p>
             <div className="field is-horizontal">

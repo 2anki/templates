@@ -3,15 +3,10 @@ import { Link } from 'react-router-dom';
 import MonacoEditor from 'react-monaco-editor';
 import TemplateSelect from './components/TemplateSelect';
 import TemplateFile from './model/TemplateFile';
+import fetchBaseType from './components/fetchBaseType';
 
 // Don't put in the render function, it gets recreated
 let files: TemplateFile[] = [];
-
-async function fetchBaseType(name: string) {
-  const url = `https://2anki.net/templates/${name}.json`;
-  const request = await window.fetch(url);
-  return request.json();
-}
 
 const options = {
   minimap: { enabled: false },

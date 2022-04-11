@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import MonacoEditor from 'react-monaco-editor';
-import TemplateSelect from './components/TemplateSelect';
-import TemplateFile from './model/TemplateFile';
-import fetchBaseType from './components/fetchBaseType';
+import { useCallback, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import MonacoEditor from "react-monaco-editor";
+import TemplateSelect from "./components/TemplateSelect";
+import TemplateFile from "./model/TemplateFile";
+import fetchBaseType from "./components/fetchBaseType";
 
 // Don't put in the render function, it gets recreated
 let files: TemplateFile[] = [];
@@ -14,14 +14,14 @@ const options = {
 };
 
 function TemplatePage() {
-  const [code, setCode] = useState('');
+  const [code, setCode] = useState("");
   const [isFront, setIsFront] = useState(true);
   const [isBack, setIsBack] = useState(false);
   const [isStyling, setIsStyling] = useState(false);
-  const [language, setLanguage] = useState('html');
+  const [language, setLanguage] = useState("html");
 
   const [currentCardType, setCurrentCardType] = useState(
-    localStorage.getItem('current-card-type') || 'n2a-basic',
+    localStorage.getItem("current-card-type") || "n2a-basic"
   );
   const [ready, setReady] = useState(false);
 
@@ -31,7 +31,7 @@ function TemplatePage() {
 
   const getCurrentCardType = useCallback(
     () => files.find((x) => x.storageKey === currentCardType),
-    [currentCardType],
+    [currentCardType]
   );
 
   const onChange = (newValue: any) => {
@@ -48,28 +48,29 @@ function TemplatePage() {
     }
   };
 
-  const fetchTemplates = useCallback(async () => {
-    files = [];
-    const templateTypes = ['n2a-basic', 'n2a-input', 'n2a-cloze'];
-    await Promise.all(templateTypes.map(async (name) => {
-      const local = localStorage.getItem(name);
-      if (local) {
-        files.push(JSON.parse(local));
-      } else {
-        const remote = await fetchBaseType(name);
-        files.push(remote);
-        localStorage.setItem(name, JSON.stringify(remote, null, 2));
-      }
-    }));
-    setReady(true);
-    setLanguage('html');
-    // Use the first basic front template as default file to load.
-    // We might want to change this later to perserve last open file.
-    setCode(files[0].front);
-  }, []);
-
   // Fetch the base presets from the server  or load from local storage (should only be called once)
   useEffect(() => {
+    const fetchTemplates = async () => {
+      files = [];
+      const templateTypes = ["n2a-basic", "n2a-input", "n2a-cloze"];
+      await Promise.all(
+        templateTypes.map(async (name) => {
+          const local = localStorage.getItem(name);
+          if (local) {
+            files.push(JSON.parse(local));
+          } else {
+            const remote = await fetchBaseType(name);
+            files.push(remote);
+            localStorage.setItem(name, JSON.stringify(remote, null, 2));
+          }
+        })
+      );
+      setReady(true);
+      setLanguage("html");
+      // Use the first basic front template as default file to load.
+      // We might want to change this later to perserve last open file.
+      setCode(files[0].front);
+    };
     fetchTemplates();
   }, []);
 
@@ -78,7 +79,7 @@ function TemplatePage() {
     if (isFront) {
       const card = getCurrentCardType();
       if (card) {
-        setLanguage('html');
+        setLanguage("html");
         setCode(card.front);
       }
       setIsStyling(false);
@@ -92,7 +93,7 @@ function TemplatePage() {
       const card = getCurrentCardType();
       if (card) {
         setCode(card.back);
-        setLanguage('html');
+        setLanguage("html");
       }
       setIsStyling(false);
       setIsFront(false);
@@ -107,7 +108,7 @@ function TemplatePage() {
       const c = getCurrentCardType();
       if (c) {
         setCode(c.styling);
-        setLanguage('css');
+        setLanguage("css");
       }
     }
   }, [getCurrentCardType, isStyling]);
@@ -122,10 +123,8 @@ function TemplatePage() {
             <hr />
             <p className="subtitle">
               No saving required, everything is saved instantly! You can always
-              revert the template changes in the
-              {' '}
-              <Link to="/upload?view=template">settings</Link>
-              . Adding /
+              revert the template changes in the{" "}
+              <Link to="/upload?view=template">settings</Link>. Adding /
               removing fields and preview is coming soon.
             </p>
             <div className="field is-horizontal">

@@ -3,6 +3,8 @@
   "version": "0.4.0",
   "private": true,
   "dependencies": {
+    "@fremtind/jkl-core": "^9.7.0",
+    "@fremtind/jkl-webfonts": "^1.1.10",
     "@testing-library/jest-dom": "^5.16.4",
     "@testing-library/react": "^12.1.4",
     "@testing-library/user-event": "^13.5.0",
@@ -10,7 +12,6 @@
     "@types/node": "^17.0.23",
     "@types/react": "^18.0.1",
     "@types/react-dom": "^18.0.0",
-    "bulma": "^0.9.3",
     "react": "^18.0.0",
     "react-app-rewired": "^2.2.1",
     "react-dom": "^18.0.0",

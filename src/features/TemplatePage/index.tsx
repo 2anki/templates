@@ -1,14 +1,12 @@
 import { useCallback, useEffect, useState } from 'react';
 import MonacoEditor from 'react-monaco-editor';
-import {
-  Tab, TabList, TabPanel, Tabs,
-} from '@fremtind/jkl-tabs-react';
 import '@fremtind/jkl-tabs/tabs.min.css';
 
 import TemplateSelect from './components/TemplateSelect';
 import TemplateFile from './model/TemplateFile';
 import fetchBaseType from './components/fetchBaseType';
 import { MainContent } from './components/styled';
+import PreviewPanel from './components/PreviewPanel';
 
 // Don't put in the render function, it gets recreated
 let files: TemplateFile[] = [];
@@ -152,14 +150,6 @@ function TemplatePage() {
                 </div>
               </div>
             </div>
-            <Tabs>
-              <TabList aria-label="tabs">
-                <Tab>Front</Tab>
-                <Tab>Back</Tab>
-              </TabList>
-              <TabPanel><div dangerouslySetInnerHTML={{ __html: getCurrentCardType()?.front || 'none' }} /></TabPanel>
-              <TabPanel><div dangerouslySetInnerHTML={{ __html: getCurrentCardType()?.back || 'none' }} /></TabPanel>
-            </Tabs>
             <div className="control m-2">
               <label htmlFor="front-template" className="radio">
                 <input
@@ -204,6 +194,7 @@ function TemplatePage() {
           </>
         )}
       </div>
+      <PreviewPanel template={getCurrentCardType()} />
     </MainContent>
   );
 }

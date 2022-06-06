@@ -5,10 +5,12 @@ import '@fremtind/jkl-loader/loader.min.css';
 import { Loader } from '@fremtind/jkl-loader-react';
 import { useEffect, useState } from 'react';
 import { TemplateFile } from '../../../types/templates';
-
 import 'grapesjs/dist/css/grapes.min.css';
 
+require('grapesjs-preset-webpage/dist/grapesjs-preset-webpage.min.css');
+
 const grapesjs = require('grapesjs');
+require('grapesjs-preset-webpage');
 
 interface PreviewPanelProps {
   template: TemplateFile | undefined
@@ -18,24 +20,37 @@ export default function PreviewPanel({ template }: PreviewPanelProps) {
   const [tabIndex, setTabIndex] = useState(0);
   const [editor, setEditor] = useState(null);
   useEffect(() => {
-    console.log('tabIndex', tabIndex);
     if (template) {
       const { front, back, styling } = template;
       const component = tabIndex === 0 ? front : back;
       if (!editor) {
-        setEditor(grapesjs.init({
+        const ed = grapesjs.init({
           container: '#preview-pane',
+          plugins: ['gjs-preset-webpage'],
+          pluginsOpts: {
+            'gjs-preset-webpage': {
+              // options
+            },
+          },
           components: component,
           style: styling,
-        }));
+        });
+        /* @ts-ignore */
+        ed.on('update', (some, argument) => {
+          // Change!
+          console.log('eeeee', some, argument);
+          /* @ts-ignore */
+          console.log(ed.getHtml());
+          /* @ts-ignore */
+          console.log(ed.getCss());
+        });
+        setEditor(ed);
       } else {
         /* @ts-ignore */
         editor.setComponents(component);
         /* @ts-ignore */
         editor.setStyle(styling);
       }
-    } else {
-      console.log('editor', editor);
     }
   }, [tabIndex]);
 

@@ -134,53 +134,17 @@ function TemplatePage() {
               removing fields and preview is coming soon.
             </p>
             <div className="field is-horizontal">
-              <div className="field-body">
-                <div className="field">
-                  <TemplateSelect
-                    values={files.map((f) => ({
-                      label: f.name,
-                      value: f.name,
-                    }))}
-                    value={currentCardType}
-                    pickedTemplate={(t) => {
-                      setIsFront(true);
-                      setCurrentCardType(t);
-                    }}
-                  />
-                </div>
-              </div>
-            </div>
-            <div className="control m-2">
-              <label htmlFor="front-template" className="radio">
-                <input
-                  checked={isFront}
-                  onChange={(event) => setIsFront(event.target.checked)}
-                  className="m-2"
-                  type="radio"
-                  name="front-template"
-                />
-                Front Template
-              </label>
-              <label htmlFor="back-template" className="radio">
-                <input
-                  checked={isBack}
-                  onChange={(event) => setIsBack(event.target.checked)}
-                  className="m-2"
-                  type="radio"
-                  name="back-template"
-                />
-                Back Template
-              </label>
-              <label htmlFor="styling" className="radio">
-                <input
-                  checked={isStyling}
-                  onChange={(event) => setIsStyling(event.target.checked)}
-                  className="m-2"
-                  type="radio"
-                  name="styling"
-                />
-                Styling
-              </label>
+              <TemplateSelect
+                values={files.map((f) => ({
+                  label: f.name,
+                  value: f.name,
+                }))}
+                value={currentCardType}
+                pickedTemplate={(t) => {
+                  setIsFront(true);
+                  setCurrentCardType(t);
+                }}
+              />
             </div>
             <MonacoEditor
               height="512px"

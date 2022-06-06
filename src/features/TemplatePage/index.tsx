@@ -1,25 +1,18 @@
 import { useCallback, useEffect, useState } from 'react';
-import MonacoEditor from 'react-monaco-editor';
 import '@fremtind/jkl-tabs/tabs.min.css';
 
 import TemplateSelect from './components/TemplateSelect';
 import fetchBaseType from './components/fetchBaseType';
 import { MainContent } from './components/styled';
 import PreviewPanel from './components/PreviewPanel';
-import FilePicker from './components/FilePicker';
 import { CardTypes, TemplateTypes, TemplateFile } from '../../types/templates';
 
 // Don't put in the render function, it gets recreated
 let files: TemplateFile[] = [];
 
-const options = {
-  minimap: { enabled: false },
-  colorDecorators: false,
-};
-
 function TemplatePage() {
-  const [code, setCode] = useState('');
-  const [language, setLanguage] = useState('html');
+  const [, setCode] = useState('');
+  const [, setLanguage] = useState('html');
   const [openFile, setOpenFile] = useState('front');
 
   const [currentCardType, setCurrentCardType] = useState(
@@ -27,28 +20,10 @@ function TemplatePage() {
   );
   const [ready, setReady] = useState(false);
 
-  const editorDidMount = (editor: { focus: () => void }) => {
-    editor.focus();
-  };
-
   const getCurrentCardType = useCallback(
     () => files.find((x) => x.storageKey === currentCardType),
     [currentCardType],
   );
-
-  const onChange = (newValue: any) => {
-    const card = getCurrentCardType();
-    if (card) {
-      if (openFile === 'front') {
-        card.front = newValue;
-      } else if (openFile === 'back') {
-        card.back = newValue;
-      } else if (openFile === 'styling') {
-        card.styling = newValue;
-      }
-      localStorage.setItem(card.storageKey, JSON.stringify(card, null, 2));
-    }
-  };
 
   // Fetch the base presets from the server  or load from local storage (should only be called once)
   useEffect(() => {
@@ -128,20 +103,6 @@ function TemplatePage() {
                 </div>
               </div>
             </div>
-            <FilePicker
-              files={['front', 'back', 'styling']}
-              selectedFile={openFile}
-              setSelectedFile={(file) => setOpenFile(file)}
-            />
-            <MonacoEditor
-              height="512px"
-              language={language}
-              theme="vs-dark"
-              value={code}
-              options={options}
-              onChange={onChange}
-              editorDidMount={editorDidMount}
-            />
           </>
         )}
       </div>

@@ -7,6 +7,8 @@
     "@fremtind/jkl-core": "^9.7.0",
     "@fremtind/jkl-loader": "^7.2.2",
     "@fremtind/jkl-loader-react": "^7.2.2",
+    "@fremtind/jkl-radio-button": "^6.0.15",
+    "@fremtind/jkl-radio-button-react": "^6.2.3",
     "@fremtind/jkl-select": "^7.0.16",
     "@fremtind/jkl-select-react": "^9.4.0",
     "@fremtind/jkl-tabs": "^1.2.22",

@@ -23,7 +23,7 @@ function TemplateSelect({
       name="produsent"
       forceCompact={false}
       variant="small"
-      label="Hvilket merke er telefonen?"
+      label="Card Type"
       helpLabel={undefined}
       errorLabel={undefined}
       items={values}

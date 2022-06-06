@@ -4,8 +4,7 @@ import {
 } from '@fremtind/jkl-tabs-react';
 import '@fremtind/jkl-loader/loader.min.css';
 import { Loader } from '@fremtind/jkl-loader-react';
-
-import TemplateFile from '../model/TemplateFile';
+import { TemplateFile } from '../../../types/templates';
 
 interface PreviewPanelProps {
   template: TemplateFile | undefined
@@ -32,8 +31,8 @@ export default function PreviewPanel({ template }: PreviewPanelProps) {
   return (
     <Tabs>
       <TabList aria-label="tabs">
-        <Tab>Front</Tab>
-        <Tab>Back</Tab>
+        <Tab>Front Preview</Tab>
+        <Tab>Back Preview</Tab>
       </TabList>
       <TabPanel>
         {renderTemplate(front)}

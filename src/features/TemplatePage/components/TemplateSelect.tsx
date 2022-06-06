@@ -1,3 +1,6 @@
+import { Select } from '@fremtind/jkl-select-react';
+import '@fremtind/jkl-select/select.min.css';
+
 interface SelectOption {
   value: string;
   label: string;
@@ -6,34 +9,28 @@ interface SelectOption {
 interface TemplateSelectPicker {
   pickedTemplate: (name: string) => void;
   values: SelectOption[];
-  name: string;
   value: string;
 }
 
 function TemplateSelect({
-  name,
   value,
   pickedTemplate,
   values,
 }: TemplateSelectPicker) {
   return (
-    <div className="field">
-      <div className="control">
-        <div className="select">
-          <select
-            name={name}
-            value={value}
-            onChange={(event) => pickedTemplate(event.target.value)}
-          >
-            {values.map((v) => (
-              <option key={v.value} value={v.value}>
-                {v.label}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
-    </div>
+    <Select
+      id="produsent"
+      name="produsent"
+      forceCompact={false}
+      variant="small"
+      label="Hvilket merke er telefonen?"
+      helpLabel={undefined}
+      errorLabel={undefined}
+      items={values}
+      value={value}
+      onChange={(event) => pickedTemplate(event.target.value)}
+      searchable
+    />
   );
 }
 

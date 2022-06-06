@@ -1,8 +1,14 @@
-import { useCallback, useEffect, useState } from "react";
-import MonacoEditor from "react-monaco-editor";
-import TemplateSelect from "./components/TemplateSelect";
-import TemplateFile from "./model/TemplateFile";
-import fetchBaseType from "./components/fetchBaseType";
+import { useCallback, useEffect, useState } from 'react';
+import MonacoEditor from 'react-monaco-editor';
+import {
+  Tab, TabList, TabPanel, Tabs,
+} from '@fremtind/jkl-tabs-react';
+import '@fremtind/jkl-tabs/tabs.min.css';
+
+import TemplateSelect from './components/TemplateSelect';
+import TemplateFile from './model/TemplateFile';
+import fetchBaseType from './components/fetchBaseType';
+import { MainContent } from './components/styled';
 
 // Don't put in the render function, it gets recreated
 let files: TemplateFile[] = [];
@@ -13,14 +19,14 @@ const options = {
 };
 
 function TemplatePage() {
-  const [code, setCode] = useState("");
+  const [code, setCode] = useState('');
   const [isFront, setIsFront] = useState(true);
   const [isBack, setIsBack] = useState(false);
   const [isStyling, setIsStyling] = useState(false);
-  const [language, setLanguage] = useState("html");
+  const [language, setLanguage] = useState('html');
 
   const [currentCardType, setCurrentCardType] = useState(
-    localStorage.getItem("current-card-type") || "n2a-basic"
+    localStorage.getItem('current-card-type') || 'n2a-basic',
   );
   const [ready, setReady] = useState(false);
 
@@ -30,7 +36,7 @@ function TemplatePage() {
 
   const getCurrentCardType = useCallback(
     () => files.find((x) => x.storageKey === currentCardType),
-    [currentCardType]
+    [currentCardType],
   );
 
   const onChange = (newValue: any) => {
@@ -51,7 +57,7 @@ function TemplatePage() {
   useEffect(() => {
     const fetchTemplates = async () => {
       files = [];
-      const templateTypes = ["n2a-basic", "n2a-input", "n2a-cloze"];
+      const templateTypes = ['n2a-basic', 'n2a-input', 'n2a-cloze'];
       await Promise.all(
         templateTypes.map(async (name) => {
           const local = localStorage.getItem(name);
@@ -62,10 +68,10 @@ function TemplatePage() {
             files.push(remote);
             localStorage.setItem(name, JSON.stringify(remote, null, 2));
           }
-        })
+        }),
       );
       setReady(true);
-      setLanguage("html");
+      setLanguage('html');
       // Use the first basic front template as default file to load.
       // We might want to change this later to perserve last open file.
       setCode(files[0].front);
@@ -78,7 +84,7 @@ function TemplatePage() {
     if (isFront) {
       const card = getCurrentCardType();
       if (card) {
-        setLanguage("html");
+        setLanguage('html');
         setCode(card.front);
       }
       setIsStyling(false);
@@ -92,7 +98,7 @@ function TemplatePage() {
       const card = getCurrentCardType();
       if (card) {
         setCode(card.back);
-        setLanguage("html");
+        setLanguage('html');
       }
       setIsStyling(false);
       setIsFront(false);
@@ -107,23 +113,26 @@ function TemplatePage() {
       const c = getCurrentCardType();
       if (c) {
         setCode(c.styling);
-        setLanguage("css");
+        setLanguage('css');
       }
     }
   }, [getCurrentCardType, isStyling]);
 
   return (
-    <section className="section mt4">
+    <MainContent>
+      <h1>Template Manager</h1>
       <div className="container">
         {!ready && <p>Loading....</p>}
         {ready && (
           <>
-            <p className="title">Template Manager</p>
+            <p className="title" />
             <hr />
             <p className="subtitle">
               No saving required, everything is saved instantly! You can always
-              revert the template changes in the{" "}
-              <a href="https://2anki.net/upload?view=template">settings</a>. Adding /
+              revert the template changes in the
+              {' '}
+              <a href="https://2anki.net/upload?view=template">settings</a>
+              . Adding /
               removing fields and preview is coming soon.
             </p>
             <div className="field is-horizontal">
@@ -135,7 +144,6 @@ function TemplatePage() {
                       value: f.name,
                     }))}
                     value={currentCardType}
-                    name="current-card-type"
                     pickedTemplate={(t) => {
                       setIsFront(true);
                       setCurrentCardType(t);
@@ -144,7 +152,14 @@ function TemplatePage() {
                 </div>
               </div>
             </div>
-            <p>Template</p>
+            <Tabs>
+              <TabList aria-label="tabs">
+                <Tab>Front</Tab>
+                <Tab>Back</Tab>
+              </TabList>
+              <TabPanel><div dangerouslySetInnerHTML={{ __html: getCurrentCardType()?.front || 'none' }} /></TabPanel>
+              <TabPanel><div dangerouslySetInnerHTML={{ __html: getCurrentCardType()?.back || 'none' }} /></TabPanel>
+            </Tabs>
             <div className="control m-2">
               <label htmlFor="front-template" className="radio">
                 <input
@@ -189,7 +204,7 @@ function TemplatePage() {
           </>
         )}
       </div>
-    </section>
+    </MainContent>
   );
 }
 

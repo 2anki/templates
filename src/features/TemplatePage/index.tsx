@@ -94,7 +94,6 @@ function TemplatePage() {
         setCode(card.front);
     }
   }, [openFile, currentCardType, getCurrentCardType]);
-
   return (
     <MainContent>
       <h1>Template Manager</h1>

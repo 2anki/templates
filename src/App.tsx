@@ -1,8 +1,13 @@
-import TemplatePage from "./features/TemplatePage";
+import '@fremtind/jkl-core/core.min.css';
+
+import TemplatePage from './features/TemplatePage';
 
 function App() {
   return (
-    <TemplatePage />
+    <div className="jkl" id="app">
+      <TemplatePage />
+      <div id="preview-pane" />
+    </div>
   );
 }
 

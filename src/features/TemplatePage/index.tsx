@@ -1,59 +1,36 @@
-import { useCallback, useEffect, useState } from "react";
-import MonacoEditor from "react-monaco-editor";
-import TemplateSelect from "./components/TemplateSelect";
-import TemplateFile from "./model/TemplateFile";
-import fetchBaseType from "./components/fetchBaseType";
+import { useCallback, useEffect, useState } from 'react';
+import '@fremtind/jkl-tabs/tabs.min.css';
+
+import TemplateSelect from './components/TemplateSelect';
+import fetchBaseType from './components/fetchBaseType';
+import { MainContent } from './components/styled';
+import PreviewPanel from './components/PreviewPanel';
+import { CardTypes, TemplateTypes, TemplateFile } from '../../types/templates';
 
 // Don't put in the render function, it gets recreated
 let files: TemplateFile[] = [];
 
-const options = {
-  minimap: { enabled: false },
-  colorDecorators: false,
-};
-
 function TemplatePage() {
-  const [code, setCode] = useState("");
-  const [isFront, setIsFront] = useState(true);
-  const [isBack, setIsBack] = useState(false);
-  const [isStyling, setIsStyling] = useState(false);
-  const [language, setLanguage] = useState("html");
+  const [, setCode] = useState('');
+  const [, setLanguage] = useState('html');
+  const [openFile, setOpenFile] = useState('front');
 
   const [currentCardType, setCurrentCardType] = useState(
-    localStorage.getItem("current-card-type") || "n2a-basic"
+    localStorage.getItem('current-card-type') || 'n2a-basic',
   );
   const [ready, setReady] = useState(false);
 
-  const editorDidMount = (editor: { focus: () => void }) => {
-    editor.focus();
-  };
-
   const getCurrentCardType = useCallback(
     () => files.find((x) => x.storageKey === currentCardType),
-    [currentCardType]
+    [currentCardType],
   );
-
-  const onChange = (newValue: any) => {
-    const card = getCurrentCardType();
-    if (card) {
-      if (isFront) {
-        card.front = newValue;
-      } else if (isBack) {
-        card.back = newValue;
-      } else if (isStyling) {
-        card.styling = newValue;
-      }
-      localStorage.setItem(card.storageKey, JSON.stringify(card, null, 2));
-    }
-  };
 
   // Fetch the base presets from the server  or load from local storage (should only be called once)
   useEffect(() => {
     const fetchTemplates = async () => {
       files = [];
-      const templateTypes = ["n2a-basic", "n2a-input", "n2a-cloze"];
       await Promise.all(
-        templateTypes.map(async (name) => {
+        [CardTypes.Basic, CardTypes.Input, CardTypes.Cloze].map(async (name) => {
           const local = localStorage.getItem(name);
           if (local) {
             files.push(JSON.parse(local));
@@ -62,10 +39,10 @@ function TemplatePage() {
             files.push(remote);
             localStorage.setItem(name, JSON.stringify(remote, null, 2));
           }
-        })
+        }),
       );
       setReady(true);
-      setLanguage("html");
+      setLanguage('html');
       // Use the first basic front template as default file to load.
       // We might want to change this later to perserve last open file.
       setCode(files[0].front);
@@ -73,57 +50,40 @@ function TemplatePage() {
     fetchTemplates();
   }, []);
 
-  // Switching to front from back or styling
   useEffect(() => {
-    if (isFront) {
-      const card = getCurrentCardType();
-      if (card) {
-        setLanguage("html");
-        setCode(card.front);
-      }
-      setIsStyling(false);
-      setIsBack(false);
+    const card = getCurrentCardType();
+    if (!card) {
+      return;
     }
-  }, [isFront, currentCardType, getCurrentCardType]);
-
-  // Switching to back from front or styling
-  useEffect(() => {
-    if (isBack) {
-      const card = getCurrentCardType();
-      if (card) {
+    switch (openFile) {
+      case 'styling':
+        setLanguage('css');
+        setCode(card.styling);
+        break;
+      case 'back':
+        setLanguage('html');
         setCode(card.back);
-        setLanguage("html");
-      }
-      setIsStyling(false);
-      setIsFront(false);
+        break;
+      default:
+        setLanguage('html');
+        setCode(card.front);
     }
-  }, [getCurrentCardType, isBack]);
-
-  useEffect(() => {
-    if (isStyling) {
-      setIsStyling(isStyling);
-      setIsFront(false);
-      setIsBack(false);
-      const c = getCurrentCardType();
-      if (c) {
-        setCode(c.styling);
-        setLanguage("css");
-      }
-    }
-  }, [getCurrentCardType, isStyling]);
-
+  }, [openFile, currentCardType, getCurrentCardType]);
   return (
-    <section className="section mt4">
+    <MainContent>
+      <h1>Template Manager</h1>
       <div className="container">
         {!ready && <p>Loading....</p>}
         {ready && (
           <>
-            <p className="title">Template Manager</p>
+            <p className="title" />
             <hr />
             <p className="subtitle">
               No saving required, everything is saved instantly! You can always
-              revert the template changes in the{" "}
-              <a href="https://2anki.net/upload?view=template">settings</a>. Adding /
+              revert the template changes in the
+              {' '}
+              <a href="https://2anki.net/upload?view=template">settings</a>
+              . Adding /
               removing fields and preview is coming soon.
             </p>
             <div className="field is-horizontal">
@@ -135,61 +95,19 @@ function TemplatePage() {
                       value: f.name,
                     }))}
                     value={currentCardType}
-                    name="current-card-type"
                     pickedTemplate={(t) => {
-                      setIsFront(true);
+                      setOpenFile(TemplateTypes.Front);
                       setCurrentCardType(t);
                     }}
                   />
                 </div>
               </div>
             </div>
-            <p>Template</p>
-            <div className="control m-2">
-              <label htmlFor="front-template" className="radio">
-                <input
-                  checked={isFront}
-                  onChange={(event) => setIsFront(event.target.checked)}
-                  className="m-2"
-                  type="radio"
-                  name="front-template"
-                />
-                Front Template
-              </label>
-              <label htmlFor="back-template" className="radio">
-                <input
-                  checked={isBack}
-                  onChange={(event) => setIsBack(event.target.checked)}
-                  className="m-2"
-                  type="radio"
-                  name="back-template"
-                />
-                Back Template
-              </label>
-              <label htmlFor="styling" className="radio">
-                <input
-                  checked={isStyling}
-                  onChange={(event) => setIsStyling(event.target.checked)}
-                  className="m-2"
-                  type="radio"
-                  name="styling"
-                />
-                Styling
-              </label>
-            </div>
-            <MonacoEditor
-              height="512px"
-              language={language}
-              theme="vs-dark"
-              value={code}
-              options={options}
-              onChange={onChange}
-              editorDidMount={editorDidMount}
-            />
           </>
         )}
       </div>
-    </section>
+      <PreviewPanel template={getCurrentCardType()} />
+    </MainContent>
   );
 }
 

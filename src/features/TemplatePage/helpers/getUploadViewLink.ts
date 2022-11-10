@@ -1,1 +1,3 @@
-export const getUploadViewLink = () => "https://2anki.net/upload?view=template"
+import { getBaseURL } from "./getBaseUrl";
+
+export const getUploadViewLink = () => `${getBaseURL()}/upload?view=template`

@@ -1,4 +1,5 @@
 import { TemplateFile } from "../model/TemplateFile";
+import { getBaseURL } from "./getBaseUrl";
 
 const post = async (url: string, body: unknown) => {
         const response = await fetch(url, {
@@ -14,5 +15,5 @@ const post = async (url: string, body: unknown) => {
       };
 
 export const saveTemplates = (templates: TemplateFile[]) => {
-    return post(`/api/templates/create`, { templates });
+    return post(`${getBaseURL()}/api/templates/create`, { templates });
   }

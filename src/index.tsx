@@ -14,7 +14,7 @@ if (container) {
     </React.StrictMode>
   );
 } else {
-  console.info("missing root container")
+  console.info("missing root container");
 }
 
 // If you want to start measuring performance in your app, pass a function

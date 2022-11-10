@@ -119,7 +119,6 @@ function TemplatePage() {
 
   useEffect(() => {
     if (isStyling) {
-      setIsStyling(isStyling);
       setIsFront(false);
       setIsBack(false);
       const c = getCurrentCardType();

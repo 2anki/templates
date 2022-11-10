@@ -1,0 +1,1 @@
+export const getUploadViewLink = () => "https://2anki.net/upload?view=template"

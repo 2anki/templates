@@ -1,4 +1,4 @@
-interface TemplateFile {
+export interface TemplateFile {
   parent: string;
   name: string;
   front: string;
@@ -6,5 +6,3 @@ interface TemplateFile {
   styling: string;
   storageKey: string;
 }
-
-export default TemplateFile;

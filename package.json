@@ -11,10 +11,13 @@
     "@types/react": "^18.0.1",
     "@types/react-dom": "^18.0.0",
     "bulma": "^0.9.3",
-    "react": "^18.0.0",
+    "lodash": "^4.17.21",
+    "react": "^18.2.0",
     "react-app-rewired": "^2.2.1",
-    "react-dom": "^18.0.0",
+    "react-cookie": "^4.1.1",
+    "react-dom": "^18.2.0",
     "react-monaco-editor": "^0.47.0",
+    "react-router-dom": "^6.4.3",
     "react-scripts": "5.0.0",
     "typescript": "^4.6.3",
     "web-vitals": "^2.1.4"
@@ -23,6 +26,7 @@
     "start": "react-scripts start",
     "build": "GENERATE_SOURCEMAP=false react-app-rewired build --max_old_space_size=4096",
     "test": "react-scripts test",
+    "dev": "npm run start",
     "eject": "react-scripts eject",
     "lint": "eslint src/**/*.ts src/**/*.tsx",
     "lint:fix": "eslint --fix src/**/*.ts src/**/*.tsx"
@@ -46,6 +50,8 @@
     ]
   },
   "devDependencies": {
+    "@types/lodash": "^4.14.188",
     "monaco-editor-webpack-plugin": "^7.0.1"
-  }
+  },
+  "proxy": "http://localhost:2020"
 }

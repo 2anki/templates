@@ -89,7 +89,7 @@ function TemplatePage() {
   // Fetch the base presets from the server  or load from local storage (should only be called once)
   useEffect(() => {
     fetchTemplates();
-  }, []);
+  }, [fetchTemplates]);
 
   // Switching to front from back or styling
   useEffect(() => {

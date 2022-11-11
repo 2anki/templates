@@ -1,11 +1,18 @@
 import { useCallback, useEffect, useState } from "react";
 import MonacoEditor from "react-monaco-editor";
+import { useCookies } from "react-cookie";
+import * as _ from "lodash";
+
 import TemplateSelect from "./components/TemplateSelect";
-import TemplateFile from "./model/TemplateFile";
-import fetchBaseType from "./components/fetchBaseType";
+import { saveTemplates } from "./helpers/saveTemplates";
+import fetchBaseType from "./helpers/fetchBaseType";
+import { TemplateFile } from "./model/TemplateFile";
+import { getUploadViewLink } from "./helpers/getUploadViewLink";
 
 // Don't put in the render function, it gets recreated
 let files: TemplateFile[] = [];
+
+const ONE_SECOND_MS = 1000;
 
 const options = {
   minimap: { enabled: false },
@@ -13,6 +20,7 @@ const options = {
 };
 
 function TemplatePage() {
+  const [token] = useCookies(["token"]);
   const [code, setCode] = useState("");
   const [isFront, setIsFront] = useState(true);
   const [isBack, setIsBack] = useState(false);
@@ -33,7 +41,13 @@ function TemplatePage() {
     [currentCardType]
   );
 
-  const onChange = (newValue: any) => {
+  const debounceSaveTemplate = _.debounce(
+    () => saveTemplates(files),
+    ONE_SECOND_MS
+  );
+  useEffect(() => debounceSaveTemplate.cancel(), [debounceSaveTemplate]);
+
+  const onChange = (newValue: string) => {
     const card = getCurrentCardType();
     if (card) {
       if (isFront) {
@@ -44,34 +58,38 @@ function TemplatePage() {
         card.styling = newValue;
       }
       localStorage.setItem(card.storageKey, JSON.stringify(card, null, 2));
+      if (token) {
+        debounceSaveTemplate();
+      }
     }
   };
 
+  const fetchTemplates = useCallback(async () => {
+    files = [];
+    const templateTypes = ["n2a-basic", "n2a-input", "n2a-cloze"];
+    await Promise.all(
+      templateTypes.map(async (name) => {
+        const local = localStorage.getItem(name);
+        if (local) {
+          files.push(JSON.parse(local));
+        } else {
+          const remote = await fetchBaseType(name);
+          files.push(remote);
+          localStorage.setItem(name, JSON.stringify(remote, null, 2));
+        }
+      })
+    );
+    setReady(true);
+    setLanguage("html");
+    // Use the first basic front template as default file to load.
+    // We might want to change this later to perserve last open file.
+    setCode(files[0].front);
+  }, []);
+
   // Fetch the base presets from the server  or load from local storage (should only be called once)
   useEffect(() => {
-    const fetchTemplates = async () => {
-      files = [];
-      const templateTypes = ["n2a-basic", "n2a-input", "n2a-cloze"];
-      await Promise.all(
-        templateTypes.map(async (name) => {
-          const local = localStorage.getItem(name);
-          if (local) {
-            files.push(JSON.parse(local));
-          } else {
-            const remote = await fetchBaseType(name);
-            files.push(remote);
-            localStorage.setItem(name, JSON.stringify(remote, null, 2));
-          }
-        })
-      );
-      setReady(true);
-      setLanguage("html");
-      // Use the first basic front template as default file to load.
-      // We might want to change this later to perserve last open file.
-      setCode(files[0].front);
-    };
     fetchTemplates();
-  }, []);
+  }, [fetchTemplates]);
 
   // Switching to front from back or styling
   useEffect(() => {
@@ -101,7 +119,6 @@ function TemplatePage() {
 
   useEffect(() => {
     if (isStyling) {
-      setIsStyling(isStyling);
       setIsFront(false);
       setIsBack(false);
       const c = getCurrentCardType();
@@ -123,8 +140,8 @@ function TemplatePage() {
             <p className="subtitle">
               No saving required, everything is saved instantly! You can always
               revert the template changes in the{" "}
-              <a href="https://2anki.net/upload?view=template">settings</a>. Adding /
-              removing fields and preview is coming soon.
+              <a href={getUploadViewLink()}>settings</a>. Adding / removing
+              fields and preview is coming soon.
             </p>
             <div className="field is-horizontal">
               <div className="field-body">

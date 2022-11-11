@@ -1,9 +1,7 @@
 import TemplatePage from "./features/TemplatePage";
 
 function App() {
-  return (
-    <TemplatePage />
-  );
+  return <TemplatePage />;
 }
 
 export default App;

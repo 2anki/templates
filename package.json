@@ -52,7 +52,7 @@
     ]
   },
   "devDependencies": {
-    "@types/lodash": "^4.14.188",
+    "@types/lodash": "^4.14.190",
     "husky": "^8.0.2",
     "monaco-editor-webpack-plugin": "^7.0.1",
     "prettier": "^2.7.1",

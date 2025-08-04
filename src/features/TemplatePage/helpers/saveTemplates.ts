@@ -15,5 +15,7 @@ const post = async (url: string, body: unknown) => {
 };
 
 export const saveTemplates = (templates: TemplateFile[]) => {
-  return post(`${getBaseURL()}/api/templates/create`, { templates });
+  const fullURL = `${getBaseURL()}/api/templates/create`;
+  console.log("Saving templates to:", fullURL);
+  return post(fullURL, { templates });
 };

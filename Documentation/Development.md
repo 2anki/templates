@@ -1,5 +1,34 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Development Setup
+
+### Local Backend Server
+
+When running in development mode (`npm start`), the application automatically detects the environment and routes API requests to a local development server instead of the production 2anki.net server.
+
+- **Development**: API requests go directly to `http://localhost:2020`
+- **Production**: API requests go directly to `https://2anki.net`
+
+To run with a local backend:
+
+1. Start your local 2anki backend server on port 2020
+2. Run `npm start` to start the frontend development server
+3. The application will automatically use the local backend for all API calls
+
+The environment detection is handled in `src/features/TemplatePage/helpers/getBaseUrl.ts` and checks for:
+
+- `process.env.NODE_ENV === 'development'`
+- `process.env.REACT_APP_ENV === 'development'`
+
+### Direct URL Configuration
+
+The application uses direct URLs for both environments:
+
+- **Development**: `http://localhost:2020` - Points directly to your local backend
+- **Production**: `https://2anki.net` - Points directly to the production server
+
+This approach is simple and explicit - no proxy configuration needed.
+
 ## Available Scripts
 
 In the project directory, you can run:

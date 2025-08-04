@@ -5,7 +5,11 @@ module.exports = function override(config) {
   if (!config.plugins) {
     config.plugins = [];
   }
-  config.plugins.push(new MonacoWebpackPlugin());
+  config.plugins.push(
+    new MonacoWebpackPlugin({
+      languages: ["html", "css", "javascript", "typescript", "json"],
+    })
+  );
   if (process.env.NODE_ENV === "production") {
     config.plugins = config.plugins.filter((plugin) => {
       return plugin.constructor.name !== "ForkTsCheckerWebpackPlugin";

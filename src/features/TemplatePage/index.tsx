@@ -3,6 +3,12 @@ import MonacoEditor from "react-monaco-editor";
 import { useCookies } from "react-cookie";
 import * as _ from "lodash";
 
+// Import monaco setup to configure workers and languages
+import "../../monaco-setup";
+
+// Import monaco-editor directly to access language registration
+import * as monaco from "monaco-editor";
+
 import TemplateSelect from "./components/TemplateSelect";
 import { saveTemplates } from "./helpers/saveTemplates";
 import fetchBaseType from "./helpers/fetchBaseType";
@@ -17,6 +23,16 @@ const ONE_SECOND_MS = 1000;
 const options = {
   minimap: { enabled: false },
   colorDecorators: false,
+  // Disable worker-dependent features to prevent "Unexpected usage" errors
+  links: false,
+  folding: false,
+  foldingStrategy: "indentation" as const,
+  // Keep syntax highlighting but disable advanced language features
+  wordBasedSuggestions: false,
+  suggest: {
+    showWords: false,
+    showSnippets: false,
+  },
 };
 
 function TemplatePage() {
@@ -32,8 +48,40 @@ function TemplatePage() {
   );
   const [ready, setReady] = useState(false);
 
-  const editorDidMount = (editor: { focus: () => void }) => {
+  const editorDidMount = (
+    editor: { focus: () => void },
+    monacoInstance: any
+  ) => {
     editor.focus();
+
+    // Use the imported monaco if the instance isn't available
+    const monacoToUse = monacoInstance || monaco;
+
+    // Ensure language services are available
+    if (monacoToUse && monacoToUse.languages) {
+      // Force register HTML language
+      if (
+        !monacoToUse.languages
+          .getLanguages()
+          .some((lang: any) => lang.id === "html")
+      ) {
+        console.warn("HTML language not registered");
+      }
+
+      // Force register CSS language
+      if (
+        !monacoToUse.languages
+          .getLanguages()
+          .some((lang: any) => lang.id === "css")
+      ) {
+        console.warn("CSS language not registered");
+      }
+
+      console.log(
+        "Available languages:",
+        monacoToUse.languages.getLanguages().map((l: any) => l.id)
+      );
+    }
   };
 
   const getCurrentCardType = useCallback(

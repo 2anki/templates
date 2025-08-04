@@ -74,7 +74,7 @@ const MonacoEditorWrapper: React.FC<MonacoEditorWrapperProps> = ({
   onNoteTypeChange,
   onPreviewDataChange,
 }) => {
-  const [showSplitView, setShowSplitView] = useState(false);
+  const [showSplitView, setShowSplitView] = useState(true);
   const [showCopilotPanel, setShowCopilotPanel] = useState(false);
   const [copilotSuggestions, setCopilotSuggestions] = useState<
     CopilotSuggestion[]
@@ -313,10 +313,10 @@ const MonacoEditorWrapper: React.FC<MonacoEditorWrapperProps> = ({
 
         <div className={styles.toolbarGroup}>
           <button
-            className={`${styles.toolbarButton} ${styles.aiButton}`}
+            className={`${styles.toolbarButton} ${styles.primaryButton}`}
             onClick={() => generateCopilotSuggestions("Generate template")}
             disabled={!copilotEnabled}
-            title="Generate with AI (Ctrl+Space)"
+            title="Generate template code with AI (Ctrl+Space)"
           >
             <Icons.Sparkles
               className={`${styles.buttonIcon} ${styles.sparklesIcon}`}
@@ -325,11 +325,11 @@ const MonacoEditorWrapper: React.FC<MonacoEditorWrapperProps> = ({
           </button>
 
           <button
-            className={`${styles.toolbarButton} ${
+            className={`${styles.toolbarButton} ${styles.primaryButton} ${
               showSplitView ? styles.active : ""
             }`}
             onClick={() => setShowSplitView(!showSplitView)}
-            title="Toggle Split View"
+            title={showSplitView ? "Hide preview panel" : "Show live preview"}
           >
             <Icons.SplitView className={styles.buttonIcon} />
             Preview
@@ -362,11 +362,13 @@ const MonacoEditorWrapper: React.FC<MonacoEditorWrapperProps> = ({
                   : "Back"}
               </div>
               <div className={styles.previewContent}>
-                <iframe
-                  className={styles.previewIframe}
-                  srcDoc={generatePreviewHtml()}
-                  title="Template Preview"
-                />
+                <div className={styles.previewCard}>
+                  <iframe
+                    className={styles.previewIframe}
+                    srcDoc={generatePreviewHtml()}
+                    title="Template Preview"
+                  />
+                </div>
               </div>
             </div>
           </div>

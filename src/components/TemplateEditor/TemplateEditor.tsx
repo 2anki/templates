@@ -53,6 +53,8 @@ const TemplateEditor: React.FC = () => {
   >("qfmt");
   const [isLoading, setIsLoading] = useState(true);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [tempName, setTempName] = useState("");
 
   const apiService = TemplateApiService.getInstance();
 
@@ -187,6 +189,46 @@ const TemplateEditor: React.FC = () => {
     [selectedTemplate]
   );
 
+  const handleTemplateNameChange = useCallback(
+    (newName: string) => {
+      if (!selectedTemplate || selectedTemplate.isShared) return;
+
+      const updatedTemplate = {
+        ...selectedTemplate,
+        name: newName.trim() || "Untitled Template",
+        updatedAt: new Date().toISOString(),
+      };
+
+      setSelectedTemplate(updatedTemplate);
+
+      // Update the template in the list
+      setUserTemplates((prev) =>
+        prev.map((t) => (t.id === updatedTemplate.id ? updatedTemplate : t))
+      );
+    },
+    [selectedTemplate]
+  );
+
+  const startEditingName = useCallback(() => {
+    if (selectedTemplate && !selectedTemplate.isShared) {
+      setIsEditingName(true);
+      setTempName(selectedTemplate.name);
+    }
+  }, [selectedTemplate]);
+
+  const saveTemplateName = useCallback(() => {
+    if (tempName.trim()) {
+      handleTemplateNameChange(tempName);
+    }
+    setIsEditingName(false);
+    setTempName("");
+  }, [tempName, handleTemplateNameChange]);
+
+  const cancelEditingName = useCallback(() => {
+    setIsEditingName(false);
+    setTempName("");
+  }, []);
+
   const handleExportTemplate = useCallback(async () => {
     if (!selectedTemplate) return;
 
@@ -237,9 +279,40 @@ const TemplateEditor: React.FC = () => {
             <div className={styles.contentHeader}>
               <div className={styles.headerLeft}>
                 <div>
-                  <h1 className={styles.projectTitle}>
-                    {selectedTemplate.name}
-                  </h1>
+                  {isEditingName ? (
+                    <div className={styles.editingNameContainer}>
+                      <input
+                        type="text"
+                        value={tempName}
+                        onChange={(e) => setTempName(e.target.value)}
+                        onBlur={saveTemplateName}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            saveTemplateName();
+                          } else if (e.key === "Escape") {
+                            cancelEditingName();
+                          }
+                        }}
+                        className={styles.nameInput}
+                        autoFocus
+                        placeholder="Template name"
+                      />
+                    </div>
+                  ) : (
+                    <h1
+                      className={`${styles.projectTitle} ${
+                        !selectedTemplate.isShared ? styles.editable : ""
+                      }`}
+                      onClick={startEditingName}
+                      title={
+                        !selectedTemplate.isShared
+                          ? "Click to edit template name"
+                          : "Template name (read-only)"
+                      }
+                    >
+                      {selectedTemplate.name}
+                    </h1>
+                  )}
                   <p className={styles.projectDescription}>
                     {selectedTemplate.description}
                     {lastSaved && (

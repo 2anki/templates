@@ -55,6 +55,8 @@ const TemplateEditor: React.FC = () => {
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [isEditingName, setIsEditingName] = useState(false);
   const [tempName, setTempName] = useState("");
+  const [isEditingDescription, setIsEditingDescription] = useState(false);
+  const [tempDescription, setTempDescription] = useState("");
 
   const apiService = TemplateApiService.getInstance();
 
@@ -229,6 +231,44 @@ const TemplateEditor: React.FC = () => {
     setTempName("");
   }, []);
 
+  const handleTemplateDescriptionChange = useCallback(
+    (newDescription: string) => {
+      if (!selectedTemplate || selectedTemplate.isShared) return;
+
+      const updatedTemplate = {
+        ...selectedTemplate,
+        description: newDescription.trim() || "No description",
+        updatedAt: new Date().toISOString(),
+      };
+
+      setSelectedTemplate(updatedTemplate);
+
+      // Update the template in the list
+      setUserTemplates((prev) =>
+        prev.map((t) => (t.id === updatedTemplate.id ? updatedTemplate : t))
+      );
+    },
+    [selectedTemplate]
+  );
+
+  const startEditingDescription = useCallback(() => {
+    if (selectedTemplate && !selectedTemplate.isShared) {
+      setIsEditingDescription(true);
+      setTempDescription(selectedTemplate.description);
+    }
+  }, [selectedTemplate]);
+
+  const saveTemplateDescription = useCallback(() => {
+    handleTemplateDescriptionChange(tempDescription);
+    setIsEditingDescription(false);
+    setTempDescription("");
+  }, [tempDescription, handleTemplateDescriptionChange]);
+
+  const cancelEditingDescription = useCallback(() => {
+    setIsEditingDescription(false);
+    setTempDescription("");
+  }, []);
+
   const handleExportTemplate = useCallback(async () => {
     if (!selectedTemplate) return;
 
@@ -313,12 +353,46 @@ const TemplateEditor: React.FC = () => {
                       {selectedTemplate.name}
                     </h1>
                   )}
-                  <p className={styles.projectDescription}>
-                    {selectedTemplate.description}
-                    {lastSaved && (
-                      <span> • Saved {lastSaved.toLocaleTimeString()}</span>
-                    )}
-                  </p>
+                  {isEditingDescription ? (
+                    <div className={styles.editingDescriptionContainer}>
+                      <textarea
+                        value={tempDescription}
+                        onChange={(e) => setTempDescription(e.target.value)}
+                        onBlur={saveTemplateDescription}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" && e.ctrlKey) {
+                            saveTemplateDescription();
+                          } else if (e.key === "Escape") {
+                            cancelEditingDescription();
+                          }
+                        }}
+                        className={styles.descriptionInput}
+                        autoFocus
+                        placeholder="Template description"
+                        rows={2}
+                      />
+                      <div className={styles.editHint}>
+                        Ctrl+Enter to save, Escape to cancel
+                      </div>
+                    </div>
+                  ) : (
+                    <p
+                      className={`${styles.projectDescription} ${
+                        !selectedTemplate.isShared ? styles.editable : ""
+                      }`}
+                      onClick={startEditingDescription}
+                      title={
+                        !selectedTemplate.isShared
+                          ? "Click to edit template description"
+                          : "Template description (read-only)"
+                      }
+                    >
+                      {selectedTemplate.description}
+                      {lastSaved && (
+                        <span> • Saved {lastSaved.toLocaleTimeString()}</span>
+                      )}
+                    </p>
+                  )}
                 </div>
               </div>
 

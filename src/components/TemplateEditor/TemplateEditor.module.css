@@ -74,6 +74,49 @@
   margin: 4px 0 0 0;
 }
 
+.projectDescription.editable {
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+  margin: 4px -8px 0 -8px;
+}
+
+.projectDescription.editable:hover {
+  background-color: #f3f4f6;
+}
+
+.editingDescriptionContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.descriptionInput {
+  font-size: 14px;
+  color: #6b7280;
+  background: white;
+  border: 2px solid #3b82f6;
+  border-radius: 6px;
+  padding: 8px;
+  margin: 4px 0 0 0;
+  outline: none;
+  min-width: 300px;
+  resize: vertical;
+  font-family: inherit;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.descriptionInput::placeholder {
+  color: #9ca3af;
+}
+
+.editHint {
+  font-size: 12px;
+  color: #9ca3af;
+  font-style: italic;
+}
+
 .headerActions {
   display: flex;
   align-items: center;

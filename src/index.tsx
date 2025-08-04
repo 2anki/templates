@@ -3,6 +3,7 @@ import reportWebVitals from "./reportWebVitals";
 import { createRoot } from "react-dom/client";
 
 import App from "./App";
+import "bulma/css/bulma.min.css";
 
 const container = document.getElementById("root");
 if (container) {

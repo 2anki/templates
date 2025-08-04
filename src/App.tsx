@@ -1,7 +1,9 @@
-import TemplatePage from "./features/TemplatePage";
+import React from "react";
+import TemplateEditor from "./components/TemplateEditor/TemplateEditor";
+import "./App.css";
 
 function App() {
-  return <TemplatePage />;
+  return <TemplateEditor />;
 }
 
 export default App;

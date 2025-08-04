@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import MonacoEditor from "react-monaco-editor";
+// import MonacoEditor from "react-monaco-editor"; // Removed old react-monaco-editor
 import { useCookies } from "react-cookie";
 import * as _ from "lodash";
 
@@ -242,6 +242,7 @@ function TemplatePage() {
                 Styling
               </label>
             </div>
+            {/* Temporarily commented out old MonacoEditor 
             <MonacoEditor
               height="512px"
               language={language}
@@ -251,6 +252,17 @@ function TemplatePage() {
               onChange={onChange}
               editorDidMount={editorDidMount}
             />
+            */}
+            <div
+              style={{
+                padding: "20px",
+                border: "1px solid #ccc",
+                borderRadius: "4px",
+              }}
+            >
+              <p>Legacy Template Editor - Temporarily disabled</p>
+              <p>Use the new TemplateEditor component instead</p>
+            </div>
           </>
         )}
       </div>

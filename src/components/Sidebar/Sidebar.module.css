@@ -1,0 +1,228 @@
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 260px;
+  background: #f8f9fa;
+  border-right: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+  overflow: hidden;
+}
+
+.sidebarHeader {
+  padding: 16px 20px;
+  border-bottom: 1px solid #e5e7eb;
+  background: white;
+}
+
+.sidebarTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+}
+
+.sidebarContent {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 0;
+}
+
+.sidebarSection {
+  margin-bottom: 24px;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  padding: 8px 20px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.sectionIcon {
+  width: 14px;
+  height: 14px;
+  margin-right: 8px;
+  opacity: 0.7;
+}
+
+.sidebarList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.sidebarItem {
+  position: relative;
+}
+
+.sidebarLink {
+  display: flex;
+  align-items: center;
+  padding: 8px 20px;
+  color: #374151;
+  text-decoration: none;
+  font-size: 14px;
+  transition: all 0.15s ease;
+  cursor: pointer;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+}
+
+.sidebarLink:hover {
+  background: #f3f4f6;
+  color: #1f2937;
+}
+
+.sidebarLink.active {
+  background: #3b82f6;
+  color: white;
+}
+
+.sidebarLink.active:hover {
+  background: #2563eb;
+}
+
+.itemIcon {
+  width: 16px;
+  height: 16px;
+  margin-right: 12px;
+  opacity: 0.7;
+  flex-shrink: 0;
+}
+
+.itemText {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.itemMeta {
+  font-size: 12px;
+  opacity: 0.6;
+  margin-left: 8px;
+}
+
+.addButton {
+  display: flex;
+  align-items: center;
+  padding: 12px 20px;
+  margin: 8px 16px;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.addButton:hover {
+  background: #2563eb;
+  transform: translateY(-1px);
+}
+
+.addIcon {
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
+}
+
+.sidebarFooter {
+  padding: 16px 20px;
+  border-top: 1px solid #e5e7eb;
+  background: white;
+}
+
+.footerButton {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  background: none;
+  border: none;
+  color: #6b7280;
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+  width: 100%;
+  text-align: left;
+}
+
+.footerButton:hover {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.emptyState {
+  padding: 20px;
+  text-align: center;
+  color: #6b7280;
+}
+
+.emptyIcon {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 12px;
+  opacity: 0.3;
+}
+
+.emptyTitle {
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.emptyDescription {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.collaborateButton {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 12px;
+  padding: 8px 16px;
+  background: #10b981;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.collaborateButton:hover {
+  background: #059669;
+  transform: translateY(-1px);
+}
+
+/* Scrollbar styling */
+.sidebarContent::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebarContent::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebarContent::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 3px;
+}
+
+.sidebarContent::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}

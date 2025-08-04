@@ -96,23 +96,6 @@
   }
 }
 
-.formatSelect {
-  padding: 6px 12px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  background: white;
-  color: #374151;
-  font-size: 14px;
-  cursor: pointer;
-  min-width: 120px;
-}
-
-.formatSelect:focus {
-  outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
 .editorWrapper {
   flex: 1;
   position: relative;

@@ -284,27 +284,6 @@ const MonacoEditorWrapper: React.FC<MonacoEditorWrapperProps> = ({
       {/* Toolbar */}
       <div className={styles.toolbar}>
         <div className={styles.toolbarGroup}>
-          <select
-            className={styles.formatSelect}
-            value={`${selectedCardIndex}-${selectedTemplate}`}
-            onChange={(e) => {
-              // This would be handled by parent component
-              console.log("Template changed:", e.target.value);
-            }}
-          >
-            {noteType.tmpls.map((cardType, index) => (
-              <React.Fragment key={index}>
-                <option value={`${index}-qfmt`}>{cardType.name} - Front</option>
-                <option value={`${index}-afmt`}>{cardType.name} - Back</option>
-              </React.Fragment>
-            ))}
-            <option value={`0-css`}>Styling (CSS)</option>
-          </select>
-        </div>
-
-        <div className={styles.toolbarSeparator} />
-
-        <div className={styles.toolbarGroup}>
           <button
             className={styles.toolbarButton}
             onClick={() => insertFormatting("bold")}

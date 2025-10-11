@@ -1,6 +1,6 @@
 [build]
-  # Install pnpm via npm then build
-  command = "npm install -g pnpm && pnpm install --frozen-lockfile && pnpm run build"
+  # Install pnpm via npm then build (bypassing Corepack completely)
+  command = "corepack disable && npm install -g pnpm@latest && pnpm install --frozen-lockfile && pnpm run build"
   
   # Directory with build output
   publish = "build"
@@ -9,8 +9,12 @@
   # Node.js version
   NODE_VERSION = "18.20.4"
   
-  # Disable Corepack entirely to avoid signature issues
+  # Completely disable Corepack
   COREPACK_ENABLE_STRICT = "0"
+  COREPACK_ENABLE_AUTO_PIN = "0"
+  
+  # Skip any automatic package manager detection
+  NPM_CONFIG_PACKAGE_MANAGER = "npm"
 
 # Redirect rules for SPA (catch-all for client-side routing)
 [[redirects]]

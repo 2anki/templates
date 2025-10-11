@@ -1,19 +1,16 @@
 [build]
-  # Build command
-  command = "pnpm run build"
+  # Install pnpm via npm then build
+  command = "npm install -g pnpm && pnpm install --frozen-lockfile && pnpm run build"
   
   # Directory with build output
   publish = "build"
 
 [build.environment]
-  # Node.js version - pnpm 10.x requires Node.js 18.12+
+  # Node.js version
   NODE_VERSION = "18.20.4"
   
-  # Enable Corepack for pnpm support
+  # Disable Corepack entirely to avoid signature issues
   COREPACK_ENABLE_STRICT = "0"
-  
-  # Set specific pnpm version to match package.json
-  PNPM_VERSION = "10.18.2"
 
 # Redirect rules for SPA (catch-all for client-side routing)
 [[redirects]]

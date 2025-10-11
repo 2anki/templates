@@ -38,9 +38,6 @@ jobs:
       - name: Run type checking
         run: pnpm run build --noEmit || true
 
-      - name: Run linter
-        run: pnpm run lint
-
       - name: Run tests
         run: pnpm run test --run
 

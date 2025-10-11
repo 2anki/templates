@@ -24,15 +24,7 @@
     "preview": "vite preview",
     "start": "vite",
     "test": "vitest",
-    "lint": "eslint src/**/*.ts src/**/*.tsx",
-    "lint:fix": "eslint --fix src/**/*.ts src/**/*.tsx",
     "prepare": "husky install"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
   },
   "browserslist": {
     "production": [

@@ -4,11 +4,11 @@
   
   # Directory with build output
   publish = "build"
-  
-  # Node.js version - pnpm 10.x requires Node.js 18.12+
-  environment = { NODE_VERSION = "18.20.4" }
 
 [build.environment]
+  # Node.js version - pnpm 10.x requires Node.js 18.12+
+  NODE_VERSION = "18.20.4"
+  
   # Enable Corepack for pnpm support
   COREPACK_ENABLE_STRICT = "0"
   

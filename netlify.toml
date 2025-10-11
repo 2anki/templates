@@ -1,0 +1,22 @@
+[build]
+  # Build command
+  command = "pnpm run build"
+  
+  # Directory with build output
+  publish = "build"
+  
+  # Node.js version - pnpm 10.x requires Node.js 18.12+
+  environment = { NODE_VERSION = "18.20.4" }
+
+[build.environment]
+  # Enable Corepack for pnpm support
+  COREPACK_ENABLE_STRICT = "0"
+  
+  # Set specific pnpm version to match package.json
+  PNPM_VERSION = "10.18.2"
+
+# Redirect rules for SPA (catch-all for client-side routing)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

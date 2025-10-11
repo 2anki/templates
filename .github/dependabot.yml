@@ -1,6 +1,15 @@
 version: 2
 updates:
-  - package-ecosystem: 'npm'
-    directory: '/'
+  - package-ecosystem: "npm"
+    directory: "/"
     schedule:
-      interval: 'weekly'
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "2anki"
+    assignees:
+      - "2anki"
+    commit-message:
+      prefix: "chore"
+      prefix-development: "chore"
+      include: "scope"

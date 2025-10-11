@@ -40,7 +40,7 @@ A beautiful, Notion-inspired template editor for creating and customizing Anki f
 ### Prerequisites
 
 - Node.js 16+
-- npm or yarn
+- pnpm (recommended) or npm
 
 ### Installation
 
@@ -54,13 +54,13 @@ cd templates
 2. Install dependencies:
 
 ```bash
-npm install
+pnpm install
 ```
 
 3. Start the development server:
 
 ```bash
-npm start
+pnpm dev
 ```
 
 4. Open your browser to `http://localhost:3000`

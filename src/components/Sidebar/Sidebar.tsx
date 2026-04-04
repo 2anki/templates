@@ -66,6 +66,7 @@ interface SidebarProps {
   onSelectTemplate: (template: TemplateProject) => void;
   onCreateNew: () => void;
   onDeleteTemplate: (templateId: string) => void;
+  onOpenMarketplace: () => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
@@ -75,6 +76,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   onSelectTemplate,
   onCreateNew,
   onDeleteTemplate,
+  onOpenMarketplace,
 }) => {
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -149,12 +151,8 @@ const Sidebar: React.FC<SidebarProps> = ({
               <Icons.Share className={styles.emptyIcon} />
               <div className={styles.emptyTitle}>No shared templates</div>
               <div className={styles.emptyDescription}>
-                Start collaborating with the community
+                Browse the marketplace or share your own
               </div>
-              <button className={styles.collaborateButton}>
-                <Icons.Users className={styles.addIcon} />
-                Start collaborating
-              </button>
             </div>
           ) : (
             <ul className={styles.sidebarList}>
@@ -178,19 +176,22 @@ const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       <div className={styles.sidebarFooter}>
-        <button className={styles.footerButton}>
+        <button className={styles.footerButton} onClick={onOpenMarketplace}>
           <Icons.Store className={styles.itemIcon} />
           Marketplace
         </button>
 
-        <button className={styles.footerButton}>
-          <Icons.Settings className={styles.itemIcon} />
-          Settings
-        </button>
-
-        <button className={styles.footerButton}>
+        <button
+          className={styles.footerButton}
+          onClick={() => {
+            if (selectedTemplateId && window.confirm("Delete this template?")) {
+              onDeleteTemplate(selectedTemplateId);
+            }
+          }}
+          disabled={!selectedTemplateId}
+        >
           <Icons.Trash className={styles.itemIcon} />
-          Trash
+          Delete
         </button>
       </div>
     </div>

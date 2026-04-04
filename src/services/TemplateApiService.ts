@@ -8,7 +8,6 @@ import { getBaseURL } from "../features/TemplatePage/helpers/getBaseUrl";
 // Mock API service for template management
 class TemplateApiService {
   private static instance: TemplateApiService;
-  private baseUrl = "https://api.2anki.net/v3"; // Mock endpoint
 
   static getInstance(): TemplateApiService {
     if (!TemplateApiService.instance) {
@@ -62,23 +61,15 @@ class TemplateApiService {
     return sampleTemplates;
   }
 
-  // Get shared/community templates
+  // Get shared/community templates from the server marketplace
   async getSharedTemplates(): Promise<TemplateProject[]> {
-    // Mock implementation
-    return [
-      {
-        id: "shared-basic",
-        name: "Clean Basic",
-        description: "A clean, minimal basic note type",
-        noteType: this.getBasicNoteType(),
-        previewData: { Front: "Sample Question", Back: "Sample Answer" },
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        isShared: true,
-        author: "AnkiCommunity",
-        tags: ["basic", "minimal"],
-      },
-    ];
+    try {
+      const response = await fetch(`${getBaseURL()}/api/templates/public`);
+      if (!response.ok) return [];
+      return response.json();
+    } catch {
+      return [];
+    }
   }
 
   // Save template
@@ -107,6 +98,29 @@ class TemplateApiService {
     const userTemplates = await this.getUserTemplates();
     const filtered = userTemplates.filter((t) => t.id !== templateId);
     localStorage.setItem("userTemplates", JSON.stringify(filtered));
+  }
+
+  // Publish template to the public marketplace
+  async publishTemplate(template: TemplateProject): Promise<void> {
+    const response = await fetch(`${getBaseURL()}/api/templates/publish`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({
+        name: template.name,
+        description: template.description,
+        noteType: template.noteType,
+        previewData: template.previewData,
+        tags: template.tags,
+      }),
+    });
+
+    if (response.status === 401) {
+      throw new Error("Please log in to 2anki.net to share templates");
+    }
+    if (!response.ok) {
+      throw new Error("Failed to publish template");
+    }
   }
 
   // Export template for Anki

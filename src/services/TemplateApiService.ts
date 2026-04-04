@@ -3,6 +3,7 @@ import {
   TemplateProject,
   PreviewData,
 } from "../types/AnkiNoteType";
+import { getBaseURL } from "../features/TemplatePage/helpers/getBaseUrl";
 
 // Mock API service for template management
 class TemplateApiService {
@@ -109,21 +110,22 @@ class TemplateApiService {
   }
 
   // Export template for Anki
-  async exportTemplate(templateId: string): Promise<string> {
+  async exportTemplate(templateId: string): Promise<ArrayBuffer> {
     const templates = await this.getUserTemplates();
     const template = templates.find((t) => t.id === templateId);
     if (!template) throw new Error("Template not found");
 
-    // Return Anki-compatible JSON format
-    return JSON.stringify(
-      {
-        __type__: "Note",
-        data: template.noteType,
-        children: [],
-      },
-      null,
-      2
-    );
+    const response = await fetch(`${getBaseURL()}/api/templates/export`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ noteType: template.noteType }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Export failed: ${response.statusText}`);
+    }
+
+    return response.arrayBuffer();
   }
 
   // Generate preview HTML

@@ -273,14 +273,13 @@ const TemplateEditor: React.FC = () => {
     if (!selectedTemplate) return;
 
     try {
-      const exportData = await apiService.exportTemplate(selectedTemplate.id);
+      const apkgBuffer = await apiService.exportTemplate(selectedTemplate.id);
 
-      // Create download
-      const blob = new Blob([exportData], { type: "application/json" });
+      const blob = new Blob([apkgBuffer], { type: "application/octet-stream" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `${selectedTemplate.name}.json`;
+      a.download = `${selectedTemplate.name}.apkg`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);

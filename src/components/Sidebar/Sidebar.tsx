@@ -166,7 +166,9 @@ const Sidebar: React.FC<SidebarProps> = ({
                   >
                     <Icons.File className={styles.itemIcon} />
                     <span className={styles.itemText}>{template.name}</span>
-                    <span className={styles.itemMeta}>{template.author}</span>
+                    <span className={styles.itemMeta}>
+                      {template.ownerName}
+                    </span>
                   </button>
                 </li>
               ))}

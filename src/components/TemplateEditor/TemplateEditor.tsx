@@ -274,6 +274,11 @@ const TemplateEditor: React.FC = () => {
   const handleShareTemplate = useCallback(async () => {
     if (!selectedTemplate || selectedTemplate.isShared) return;
 
+    const confirmed = window.confirm(
+      "Share this template publicly? It will be visible to all 2anki users and cannot be removed once shared."
+    );
+    if (!confirmed) return;
+
     try {
       setShareError(null);
       await apiService.publishTemplate(selectedTemplate);

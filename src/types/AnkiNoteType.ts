@@ -50,6 +50,6 @@ export interface TemplateProject {
   createdAt: string;
   updatedAt: string;
   isShared: boolean;
-  author?: string;
+  ownerName?: string;
   tags: string[];
 }

@@ -118,7 +118,10 @@ class TemplateApiService {
     const response = await fetch(`${getBaseURL()}/api/templates/export`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ noteType: template.noteType }),
+      body: JSON.stringify({
+        noteType: template.noteType,
+        previewData: template.previewData,
+      }),
     });
 
     if (!response.ok) {

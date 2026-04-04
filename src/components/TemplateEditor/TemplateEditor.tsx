@@ -329,9 +329,9 @@ const TemplateEditor: React.FC = () => {
         onSelectTemplate={handleSelectTemplate}
         onCreateNew={createNewTemplate}
         onDeleteTemplate={handleDeleteTemplate}
-        onOpenMarketplace={async () => {
-          const fresh = await apiService.getSharedTemplates();
-          setSharedTemplates(fresh);
+        onOpenMarketplace={() => {
+          const webUrl = import.meta.env.VITE_WEB_URL ?? "https://2anki.net";
+          window.open(`${webUrl}/marketplace`, "_blank", "noopener,noreferrer");
         }}
       />
 

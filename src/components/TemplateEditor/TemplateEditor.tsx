@@ -576,7 +576,7 @@ const TemplateEditor: React.FC = () => {
           <div className={styles.emptyState}>
             <Icons.Template className={styles.emptyIcon} />
             <h2 className={styles.emptyTitle}>
-              Welcome to Anki Template Editor
+              Welcome to 2Anki Templates Editor
             </h2>
             <p className={styles.emptyDescription}>
               Create beautiful, customizable Anki flashcard templates with our

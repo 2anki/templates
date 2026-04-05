@@ -94,7 +94,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   return (
     <div className={styles.sidebar}>
       <div className={styles.sidebarHeader}>
-        <h1 className={styles.sidebarTitle}>Anki Templates</h1>
+        <h1 className={styles.sidebarTitle}>2anki Templates</h1>
       </div>
 
       <div className={styles.sidebarContent}>

@@ -48,5 +48,10 @@
     "vite": "^7.1.12",
     "vite-plugin-monaco-editor": "^1.1.0",
     "vitest": "^3.2.4"
+  },
+  "pnpm": {
+    "overrides": {
+      "dompurify": "^3.3.2"
+    }
   }
 }

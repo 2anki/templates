@@ -176,6 +176,29 @@ const TemplateEditor: React.FC = () => {
     [selectedTemplate]
   );
 
+  const handleAddField = useCallback(() => {
+    if (!selectedTemplate) return;
+    const name = window.prompt("Field name:");
+    if (!name || !name.trim()) return;
+    const trimmed = name.trim();
+    const alreadyExists = selectedTemplate.noteType.flds.some(
+      (f) => f.name === trimmed
+    );
+    if (alreadyExists) return;
+    const newField = {
+      name: trimmed,
+      ord: selectedTemplate.noteType.flds.length,
+      sticky: false,
+      rtl: false,
+      font: "Inter",
+      size: 20,
+    };
+    handleNoteTypeChange({
+      ...selectedTemplate.noteType,
+      flds: [...selectedTemplate.noteType.flds, newField],
+    });
+  }, [selectedTemplate, handleNoteTypeChange]);
+
   const handlePreviewDataChange = useCallback(
     (previewData: PreviewData) => {
       if (!selectedTemplate) return;
@@ -482,6 +505,7 @@ const TemplateEditor: React.FC = () => {
                   </h2>
                   <button
                     className={styles.actionButton}
+                    onClick={handleAddField}
                     disabled={selectedTemplate.isShared}
                   >
                     <Icons.Plus className={styles.actionIcon} />

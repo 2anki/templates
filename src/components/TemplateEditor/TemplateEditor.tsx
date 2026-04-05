@@ -6,6 +6,7 @@ import {
 } from "../../types/AnkiNoteType";
 import { NoteBaseType, NOTE_BASE_TYPE_LABELS } from "../../types/NoteBaseType";
 import TemplateApiService from "../../services/TemplateApiService";
+import { validateTemplate } from "../../lib/validateTemplate";
 import Sidebar from "../Sidebar/Sidebar";
 import MonacoEditorWrapper from "../MonacoEditorWrapper/MonacoEditorWrapper";
 import NewTemplateDialog from "../NewTemplateDialog/NewTemplateDialog";
@@ -60,6 +61,9 @@ const TemplateEditor: React.FC = () => {
   const [isEditingDescription, setIsEditingDescription] = useState(false);
   const [tempDescription, setTempDescription] = useState("");
   const [showNewTemplateDialog, setShowNewTemplateDialog] = useState(false);
+  const [exportErrors, setExportErrors] = useState<string[]>([]);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isFieldsExpanded, setIsFieldsExpanded] = useState(true);
 
   const apiService = TemplateApiService.getInstance();
 
@@ -108,6 +112,26 @@ const TemplateEditor: React.FC = () => {
       return () => clearTimeout(timeoutId);
     }
   }, [selectedTemplate, apiService]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!e.altKey || !selectedTemplate) return;
+      if (e.key === "1") {
+        e.preventDefault();
+        setSelectedTemplateType("qfmt");
+      }
+      if (e.key === "2") {
+        e.preventDefault();
+        setSelectedTemplateType("afmt");
+      }
+      if (e.key === "3") {
+        e.preventDefault();
+        setSelectedTemplateType("css");
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [selectedTemplate]);
 
   const createNewTemplate = useCallback(
     (baseType: NoteBaseType) => {
@@ -338,6 +362,21 @@ const TemplateEditor: React.FC = () => {
   const handleExportTemplate = useCallback(async () => {
     if (!selectedTemplate) return;
 
+    const fieldNames = selectedTemplate.noteType.flds.map((f) => f.name);
+    const allErrors: string[] = [];
+    for (const tmpl of selectedTemplate.noteType.tmpls) {
+      const frontErrors = validateTemplate(tmpl.qfmt, fieldNames);
+      const backErrors = validateTemplate(tmpl.afmt, fieldNames);
+      [...frontErrors, ...backErrors].forEach((e) =>
+        allErrors.push(`${tmpl.name}: ${e.message}`)
+      );
+    }
+    if (allErrors.length > 0) {
+      setExportErrors(allErrors);
+      return;
+    }
+    setExportErrors([]);
+
     try {
       const apkgBuffer = await apiService.exportTemplate(selectedTemplate.id);
 
@@ -379,6 +418,8 @@ const TemplateEditor: React.FC = () => {
           const webUrl = import.meta.env.VITE_WEB_URL ?? "https://2anki.net";
           window.open(`${webUrl}/marketplace`, "_blank", "noopener,noreferrer");
         }}
+        isCollapsed={isSidebarCollapsed}
+        onToggleCollapse={() => setIsSidebarCollapsed((v) => !v)}
       />
 
       {showNewTemplateDialog && (
@@ -388,7 +429,10 @@ const TemplateEditor: React.FC = () => {
         />
       )}
 
-      <div className={styles.mainContent}>
+      <div
+        className={styles.mainContent}
+        style={{ marginLeft: isSidebarCollapsed ? "48px" : "260px" }}
+      >
         {selectedTemplate ? (
           <>
             {/* Header */}
@@ -481,16 +525,25 @@ const TemplateEditor: React.FC = () => {
 
               <div className={styles.headerActions}>
                 <button
-                  className={styles.actionButton}
+                  className={`${styles.actionButton} ${styles.primary}`}
                   onClick={handleExportTemplate}
                   disabled={selectedTemplate.isShared}
                 >
                   <Icons.Download className={styles.actionIcon} />
                   Export for Anki
                 </button>
+                {exportErrors.length > 0 && (
+                  <div className={styles.exportErrors}>
+                    {exportErrors.map((e, i) => (
+                      <div key={i} className={styles.exportError}>
+                        {e}
+                      </div>
+                    ))}
+                  </div>
+                )}
 
                 <button
-                  className={`${styles.actionButton} ${styles.primary}`}
+                  className={styles.actionButton}
                   disabled={selectedTemplate.isShared}
                   onClick={handleShareTemplate}
                   title={
@@ -500,7 +553,7 @@ const TemplateEditor: React.FC = () => {
                   }
                 >
                   <Icons.Share className={styles.actionIcon} />
-                  {selectedTemplate.isShared ? "Shared" : "Share Template"}
+                  {selectedTemplate.isShared ? "Shared" : "Share"}
                 </button>
                 {shareError && (
                   <span className={styles.shareError}>{shareError}</span>
@@ -513,49 +566,63 @@ const TemplateEditor: React.FC = () => {
               {/* Field Editor */}
               <div className={styles.fieldEditor}>
                 <div className={styles.fieldEditorHeader}>
-                  <h2 className={styles.fieldEditorTitle}>
-                    Fields & Preview Data
-                  </h2>
                   <button
-                    className={styles.actionButton}
-                    onClick={handleAddField}
-                    disabled={selectedTemplate.isShared}
+                    className={styles.fieldsToggleButton}
+                    onClick={() => setIsFieldsExpanded((v) => !v)}
                   >
-                    <Icons.Plus className={styles.actionIcon} />
-                    Add Field
+                    <span
+                      className={`${styles.fieldsToggleChevron} ${
+                        isFieldsExpanded ? styles.chevronDown : ""
+                      }`}
+                    >
+                      ▶
+                    </span>
+                    Fields & Preview Data
                   </button>
+                  {isFieldsExpanded && (
+                    <button
+                      className={styles.actionButton}
+                      onClick={handleAddField}
+                      disabled={selectedTemplate.isShared}
+                    >
+                      <Icons.Plus className={styles.actionIcon} />
+                      Add Field
+                    </button>
+                  )}
                 </div>
 
-                <div className={styles.fieldsList}>
-                  {selectedTemplate.noteType.flds.map((field, index) => (
-                    <div key={index} className={styles.fieldItem}>
-                      <div className={styles.fieldItemHeader}>
-                        <span className={styles.fieldName}>{field.name}</span>
-                        <button
-                          className={styles.deleteFieldButton}
-                          onClick={() => handleDeleteField(field.name)}
+                {isFieldsExpanded && (
+                  <div className={styles.fieldsList}>
+                    {selectedTemplate.noteType.flds.map((field, index) => (
+                      <div key={index} className={styles.fieldItem}>
+                        <div className={styles.fieldItemHeader}>
+                          <span className={styles.fieldName}>{field.name}</span>
+                          <button
+                            className={styles.deleteFieldButton}
+                            onClick={() => handleDeleteField(field.name)}
+                            disabled={selectedTemplate.isShared}
+                            title={`Delete ${field.name}`}
+                          >
+                            ✕
+                          </button>
+                        </div>
+                        <textarea
+                          className={styles.fieldInput}
+                          value={selectedTemplate.previewData[field.name] || ""}
+                          onChange={(e) => {
+                            const newPreviewData = {
+                              ...selectedTemplate.previewData,
+                              [field.name]: e.target.value,
+                            };
+                            handlePreviewDataChange(newPreviewData);
+                          }}
+                          placeholder={`Enter ${field.name} content for preview...`}
                           disabled={selectedTemplate.isShared}
-                          title={`Delete ${field.name}`}
-                        >
-                          ✕
-                        </button>
+                        />
                       </div>
-                      <textarea
-                        className={styles.fieldInput}
-                        value={selectedTemplate.previewData[field.name] || ""}
-                        onChange={(e) => {
-                          const newPreviewData = {
-                            ...selectedTemplate.previewData,
-                            [field.name]: e.target.value,
-                          };
-                          handlePreviewDataChange(newPreviewData);
-                        }}
-                        placeholder={`Enter ${field.name} content for preview...`}
-                        disabled={selectedTemplate.isShared}
-                      />
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Template Editor */}
@@ -574,8 +641,10 @@ const TemplateEditor: React.FC = () => {
                           setSelectedCardIndex(index);
                           setSelectedTemplateType("qfmt");
                         }}
+                        title="Front template (Alt+1)"
                       >
                         {cardType.name} - Front
+                        <kbd className={styles.tabKbd}>⌥1</kbd>
                       </button>
                       <button
                         className={`${styles.templateTab} ${
@@ -588,8 +657,10 @@ const TemplateEditor: React.FC = () => {
                           setSelectedCardIndex(index);
                           setSelectedTemplateType("afmt");
                         }}
+                        title="Back template (Alt+2)"
                       >
                         {cardType.name} - Back
+                        <kbd className={styles.tabKbd}>⌥2</kbd>
                       </button>
                     </React.Fragment>
                   ))}
@@ -598,8 +669,10 @@ const TemplateEditor: React.FC = () => {
                       selectedTemplateType === "css" ? styles.active : ""
                     }`}
                     onClick={() => setSelectedTemplateType("css")}
+                    title="Styling (Alt+3)"
                   >
                     Styling
+                    <kbd className={styles.tabKbd}>⌥3</kbd>
                   </button>
                 </div>
 
@@ -608,6 +681,9 @@ const TemplateEditor: React.FC = () => {
                   selectedCardIndex={selectedCardIndex}
                   selectedTemplate={selectedTemplateType}
                   previewData={selectedTemplate.previewData}
+                  defaultCss={apiService.getDefaultCss(
+                    selectedTemplate.baseType
+                  )}
                   onNoteTypeChange={handleNoteTypeChange}
                   onPreviewDataChange={handlePreviewDataChange}
                 />

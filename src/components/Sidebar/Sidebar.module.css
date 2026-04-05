@@ -10,12 +10,22 @@
   flex-direction: column;
   z-index: 100;
   overflow: hidden;
+  transition: width 0.2s ease;
+}
+
+.sidebarCollapsed {
+  width: 48px;
 }
 
 .sidebarHeader {
-  padding: 16px 20px;
+  padding: 12px 12px 12px 20px;
   border-bottom: 1px solid #e5e7eb;
   background: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 49px;
 }
 
 .sidebarTitle {
@@ -225,4 +235,69 @@
 
 .sidebarContent::-webkit-scrollbar-thumb:hover {
   background: #9ca3af;
+}
+
+.collapseButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  background: none;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #6b7280;
+  transition: all 0.15s ease;
+}
+
+.collapseButton:hover {
+  background: #f3f4f6;
+  border-color: #d1d5db;
+  color: #374151;
+}
+
+.collapseIcon {
+  width: 16px;
+  height: 16px;
+}
+
+.searchContainer {
+  padding: 10px 12px 2px;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 6px 10px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  font-size: 13px;
+  color: #374151;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.15s ease;
+}
+
+.searchInput::placeholder {
+  color: #c4c9d4;
+}
+
+.searchInput:focus {
+  border-color: #93c5fd;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+.typeGroup {
+  margin-bottom: 4px;
+}
+
+.typeGroupLabel {
+  padding: 6px 20px 3px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #d1d5db;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
 }

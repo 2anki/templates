@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import { TemplateProject } from "../../types/AnkiNoteType";
-import { NOTE_BASE_TYPE_LABELS } from "../../types/NoteBaseType";
+import { NoteBaseType, NOTE_BASE_TYPE_LABELS } from "../../types/NoteBaseType";
 import styles from "./Sidebar.module.css";
 
 // Simple SVG icons as React components
@@ -58,6 +58,18 @@ const Icons = {
       <path d="M10,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V8C22,6.89 21.1,6 20,6H12L10,4Z" />
     </svg>
   ),
+
+  ChevronLeft: ({ className }: { className?: string }) => (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
+      <path d="M15.41,16.58L10.83,12L15.41,7.41L14,6L8,12L14,18L15.41,16.58Z" />
+    </svg>
+  ),
+
+  ChevronRight: ({ className }: { className?: string }) => (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
+      <path d="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z" />
+    </svg>
+  ),
 };
 
 interface SidebarProps {
@@ -68,6 +80,8 @@ interface SidebarProps {
   onCreateNew: () => void;
   onDeleteTemplate: (templateId: string) => void;
   onOpenMarketplace: () => void;
+  isCollapsed: boolean;
+  onToggleCollapse: () => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
@@ -78,7 +92,11 @@ const Sidebar: React.FC<SidebarProps> = ({
   onCreateNew,
   onDeleteTemplate,
   onOpenMarketplace,
+  isCollapsed,
+  onToggleCollapse,
 }) => {
+  const [searchQuery, setSearchQuery] = useState("");
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     const now = new Date();
@@ -91,114 +109,190 @@ const Sidebar: React.FC<SidebarProps> = ({
     return date.toLocaleDateString();
   };
 
+  const filteredUserTemplates = userTemplates.filter((t) =>
+    t.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const templatesByType = filteredUserTemplates.reduce<
+    Record<string, TemplateProject[]>
+  >((groups, template) => {
+    const key = template.baseType ?? "other";
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(template);
+    return groups;
+  }, {});
+
+  const typeOrder = [
+    NoteBaseType.Basic,
+    NoteBaseType.BasicReversed,
+    NoteBaseType.BasicOptionalReversed,
+    NoteBaseType.BasicTypeAnswer,
+    NoteBaseType.Cloze,
+    NoteBaseType.ImageOcclusion,
+    "other",
+  ] as string[];
+
+  const sortedTypeKeys = Object.keys(templatesByType).sort(
+    (a, b) => typeOrder.indexOf(a) - typeOrder.indexOf(b)
+  );
+
   return (
-    <div className={styles.sidebar}>
+    <div
+      className={`${styles.sidebar} ${
+        isCollapsed ? styles.sidebarCollapsed : ""
+      }`}
+    >
       <div className={styles.sidebarHeader}>
-        <h1 className={styles.sidebarTitle}>2anki Templates</h1>
-      </div>
-
-      <div className={styles.sidebarContent}>
-        {/* Private Templates Section */}
-        <div className={styles.sidebarSection}>
-          <div className={styles.sectionHeader}>
-            <Icons.Document className={styles.sectionIcon} />
-            Private
-          </div>
-
-          {userTemplates.length === 0 ? (
-            <div className={styles.emptyState}>
-              <Icons.EmptyFolder className={styles.emptyIcon} />
-              <div className={styles.emptyTitle}>No templates yet</div>
-              <div className={styles.emptyDescription}>
-                Create your first template to get started
-              </div>
-            </div>
-          ) : (
-            <ul className={styles.sidebarList}>
-              {userTemplates.map((template) => (
-                <li key={template.id} className={styles.sidebarItem}>
-                  <button
-                    className={`${styles.sidebarLink} ${
-                      selectedTemplateId === template.id ? styles.active : ""
-                    }`}
-                    onClick={() => onSelectTemplate(template)}
-                  >
-                    <Icons.File className={styles.itemIcon} />
-                    <span className={styles.itemText}>{template.name}</span>
-                    <span className={styles.itemMeta}>
-                      {template.baseType
-                        ? NOTE_BASE_TYPE_LABELS[template.baseType]
-                        : formatDate(template.updatedAt)}
-                    </span>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-
-          <button className={styles.addButton} onClick={onCreateNew}>
-            <Icons.Plus className={styles.addIcon} />
-            Add new template
-          </button>
-        </div>
-
-        {/* Shared Templates Section */}
-        <div className={styles.sidebarSection}>
-          <div className={styles.sectionHeader}>
-            <Icons.Users className={styles.sectionIcon} />
-            Shared
-          </div>
-
-          {sharedTemplates.length === 0 ? (
-            <div className={styles.emptyState}>
-              <Icons.Share className={styles.emptyIcon} />
-              <div className={styles.emptyTitle}>No shared templates</div>
-              <div className={styles.emptyDescription}>
-                Browse the marketplace or share your own
-              </div>
-            </div>
-          ) : (
-            <ul className={styles.sidebarList}>
-              {sharedTemplates.map((template) => (
-                <li key={template.id} className={styles.sidebarItem}>
-                  <button
-                    className={`${styles.sidebarLink} ${
-                      selectedTemplateId === template.id ? styles.active : ""
-                    }`}
-                    onClick={() => onSelectTemplate(template)}
-                  >
-                    <Icons.File className={styles.itemIcon} />
-                    <span className={styles.itemText}>{template.name}</span>
-                    <span className={styles.itemMeta}>
-                      {template.ownerName}
-                    </span>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      </div>
-
-      <div className={styles.sidebarFooter}>
-        <button className={styles.footerButton} onClick={onOpenMarketplace}>
-          <Icons.Store className={styles.itemIcon} />
-          Marketplace
-        </button>
-
+        {!isCollapsed && (
+          <h1 className={styles.sidebarTitle}>2anki Templates</h1>
+        )}
         <button
-          className={styles.footerButton}
-          onClick={() => {
-            if (selectedTemplateId && window.confirm("Delete this template?")) {
-              onDeleteTemplate(selectedTemplateId);
-            }
-          }}
-          disabled={!selectedTemplateId}
+          className={styles.collapseButton}
+          onClick={onToggleCollapse}
+          title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
-          <Icons.Trash className={styles.itemIcon} />
-          Delete
+          {isCollapsed ? (
+            <Icons.ChevronRight className={styles.collapseIcon} />
+          ) : (
+            <Icons.ChevronLeft className={styles.collapseIcon} />
+          )}
         </button>
       </div>
+
+      {!isCollapsed && (
+        <>
+          <div className={styles.sidebarContent}>
+            {/* Search */}
+            <div className={styles.searchContainer}>
+              <input
+                className={styles.searchInput}
+                type="text"
+                placeholder="Search templates..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+
+            {/* Private Templates Section */}
+            <div className={styles.sidebarSection}>
+              <div className={styles.sectionHeader}>
+                <Icons.Document className={styles.sectionIcon} />
+                Private
+              </div>
+
+              {userTemplates.length === 0 ? (
+                <div className={styles.emptyState}>
+                  <Icons.EmptyFolder className={styles.emptyIcon} />
+                  <div className={styles.emptyTitle}>No templates yet</div>
+                  <div className={styles.emptyDescription}>
+                    Create your first template to get started
+                  </div>
+                </div>
+              ) : filteredUserTemplates.length === 0 ? (
+                <div className={styles.emptyState}>
+                  <div className={styles.emptyTitle}>No results</div>
+                </div>
+              ) : (
+                sortedTypeKeys.map((typeKey) => (
+                  <div key={typeKey} className={styles.typeGroup}>
+                    <div className={styles.typeGroupLabel}>
+                      {typeKey === "other"
+                        ? "Other"
+                        : NOTE_BASE_TYPE_LABELS[typeKey as NoteBaseType]}
+                    </div>
+                    <ul className={styles.sidebarList}>
+                      {templatesByType[typeKey].map((template) => (
+                        <li key={template.id} className={styles.sidebarItem}>
+                          <button
+                            className={`${styles.sidebarLink} ${
+                              selectedTemplateId === template.id
+                                ? styles.active
+                                : ""
+                            }`}
+                            onClick={() => onSelectTemplate(template)}
+                          >
+                            <Icons.File className={styles.itemIcon} />
+                            <span className={styles.itemText}>
+                              {template.name}
+                            </span>
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))
+              )}
+
+              <button className={styles.addButton} onClick={onCreateNew}>
+                <Icons.Plus className={styles.addIcon} />
+                Add new template
+              </button>
+            </div>
+
+            {/* Shared Templates Section */}
+            <div className={styles.sidebarSection}>
+              <div className={styles.sectionHeader}>
+                <Icons.Users className={styles.sectionIcon} />
+                Shared
+              </div>
+
+              {sharedTemplates.length === 0 ? (
+                <div className={styles.emptyState}>
+                  <Icons.Share className={styles.emptyIcon} />
+                  <div className={styles.emptyTitle}>No shared templates</div>
+                  <div className={styles.emptyDescription}>
+                    Browse the marketplace or share your own
+                  </div>
+                </div>
+              ) : (
+                <ul className={styles.sidebarList}>
+                  {sharedTemplates.map((template) => (
+                    <li key={template.id} className={styles.sidebarItem}>
+                      <button
+                        className={`${styles.sidebarLink} ${
+                          selectedTemplateId === template.id
+                            ? styles.active
+                            : ""
+                        }`}
+                        onClick={() => onSelectTemplate(template)}
+                      >
+                        <Icons.File className={styles.itemIcon} />
+                        <span className={styles.itemText}>{template.name}</span>
+                        <span className={styles.itemMeta}>
+                          {template.ownerName}
+                        </span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </div>
+
+          <div className={styles.sidebarFooter}>
+            <button className={styles.footerButton} onClick={onOpenMarketplace}>
+              <Icons.Store className={styles.itemIcon} />
+              Marketplace
+            </button>
+
+            <button
+              className={styles.footerButton}
+              onClick={() => {
+                if (
+                  selectedTemplateId &&
+                  window.confirm("Delete this template?")
+                ) {
+                  onDeleteTemplate(selectedTemplateId);
+                }
+              }}
+              disabled={!selectedTemplateId}
+            >
+              <Icons.Trash className={styles.itemIcon} />
+              Delete
+            </button>
+          </div>
+        </>
+      )}
     </div>
   );
 };

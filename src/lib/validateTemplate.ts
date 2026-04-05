@@ -168,3 +168,57 @@ export function validateTemplate(
 
   return errors;
 }
+
+export function validateCss(css: string): TemplateError[] {
+  const errors: TemplateError[] = [];
+  const lines = css.split("\n");
+
+  let openBraces = 0;
+  let openBraceLine = 1;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const lineNumber = i + 1;
+
+    for (const ch of line) {
+      if (ch === "{") {
+        openBraces++;
+        openBraceLine = lineNumber;
+      } else if (ch === "}") {
+        openBraces--;
+        if (openBraces < 0) {
+          errors.push({
+            message: "Unexpected } — no matching opening {",
+            severity: "error",
+            line: lineNumber,
+            column: 1,
+            endColumn: line.length + 1,
+          });
+          openBraces = 0;
+        }
+      }
+    }
+
+    if (/:\s*;/.test(line) || /:\s*}/.test(line)) {
+      errors.push({
+        message: "Empty CSS property value",
+        severity: "error",
+        line: lineNumber,
+        column: 1,
+        endColumn: line.length + 1,
+      });
+    }
+  }
+
+  if (openBraces > 0) {
+    errors.push({
+      message: `Missing closing } — ${openBraces} unclosed block(s)`,
+      severity: "error",
+      line: openBraceLine,
+      column: 1,
+      endColumn: 1,
+    });
+  }
+
+  return errors;
+}

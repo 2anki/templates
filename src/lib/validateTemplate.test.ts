@@ -1,5 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { validateTemplate, type TemplateError } from "./validateTemplate";
+import {
+  validateTemplate,
+  validateCss,
+  type TemplateError,
+} from "./validateTemplate";
 
 describe("validateTemplate", () => {
   it("returns no errors for a valid field reference", () => {
@@ -114,5 +118,35 @@ describe("validateTemplate", () => {
   it("returns multiple errors for multiple unknown fields", () => {
     const errors = validateTemplate("{{A}} {{B}}", []);
     expect(errors).toHaveLength(2);
+  });
+});
+
+describe("validateCss", () => {
+  it("returns no errors for valid CSS", () => {
+    const errors = validateCss(".card { color: red; font-size: 16px; }");
+    expect(errors).toHaveLength(0);
+  });
+
+  it("returns no errors for empty CSS", () => {
+    const errors = validateCss("");
+    expect(errors).toHaveLength(0);
+  });
+
+  it("returns an error for an empty property value", () => {
+    const errors = validateCss(".card { color: ; }");
+    expect(errors.length).toBeGreaterThan(0);
+    expect(errors[0].severity).toBe("error");
+  });
+
+  it("returns an error for unclosed brace", () => {
+    const errors = validateCss(".card { color: red;");
+    expect(errors.length).toBeGreaterThan(0);
+    expect(errors[0].message).toMatch(/unclosed/i);
+  });
+
+  it("returns an error for unexpected closing brace", () => {
+    const errors = validateCss(".card { color: red; } }");
+    expect(errors.length).toBeGreaterThan(0);
+    expect(errors[0].message).toMatch(/unexpected/i);
   });
 });

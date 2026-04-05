@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { validateTemplate } from "./validateTemplate";
+import { validateTemplate, type TemplateError } from "./validateTemplate";
 
 describe("validateTemplate", () => {
   it("returns no errors for a valid field reference", () => {
@@ -45,7 +45,7 @@ describe("validateTemplate", () => {
 
   it("returns an error for mismatched conditional tags", () => {
     const errors = validateTemplate("{{#One}}{{/Two}}", ["One", "Two"]);
-    const mismatchError = errors.find((e) =>
+    const mismatchError = errors.find((e: TemplateError) =>
       e.message.includes("expected {{/One}}")
     );
     expect(mismatchError).toBeDefined();

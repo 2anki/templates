@@ -1,8 +1,9 @@
-import React, { useState, useRef, useCallback } from "react";
+import React, { useState, useRef, useCallback, useEffect } from "react";
 import Editor from "@monaco-editor/react";
 import * as monaco from "monaco-editor";
 import { AnkiNoteType, PreviewData } from "../../types/AnkiNoteType";
 import TemplateApiService from "../../services/TemplateApiService";
+import { validateTemplate } from "../../lib/validateTemplate";
 import styles from "./MonacoEditorWrapper.module.css";
 
 // Icons
@@ -126,9 +127,37 @@ const MonacoEditorWrapper: React.FC<MonacoEditorWrapperProps> = ({
     [noteType, selectedCardIndex, selectedTemplate, onNoteTypeChange]
   );
 
+  useEffect(() => {
+    if (!editorRef.current) return;
+
+    const model = editorRef.current.getModel();
+    if (!model) return;
+
+    if (selectedTemplate === "css") {
+      monaco.editor.setModelMarkers(model, "template-validator", []);
+      return;
+    }
+
+    const fieldNames = noteType.flds.map((f) => f.name);
+    const content = getCurrentContent();
+    const errors = validateTemplate(content, fieldNames);
+
+    monaco.editor.setModelMarkers(
+      model,
+      "template-validator",
+      errors.map((e) => ({
+        severity: monaco.MarkerSeverity.Error,
+        message: e.message,
+        startLineNumber: e.line,
+        startColumn: e.column,
+        endLineNumber: e.line,
+        endColumn: e.endColumn,
+      }))
+    );
+  }, [noteType, selectedCardIndex, selectedTemplate, getCurrentContent]);
+
   const generateCopilotSuggestions = useCallback(async (prompt: string) => {
     setIsLoadingSuggestions(true);
-
     // Mock Copilot suggestions - in a real app, this would call an AI API
     await new Promise((resolve) => setTimeout(resolve, 1500));
 

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback, useEffect } from "react";
+import React, { useState, useRef, useCallback, useMemo } from "react";
 import Editor from "@monaco-editor/react";
 import * as monaco from "monaco-editor";
 import { AnkiNoteType, PreviewData } from "../../types/AnkiNoteType";
@@ -84,12 +84,7 @@ const MonacoEditorWrapper: React.FC<MonacoEditorWrapperProps> = ({
   const [copilotEnabled] = useState(true);
 
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
-  const noteTypeRef = useRef(noteType);
-  const selectedTemplateRef = useRef(selectedTemplate);
   const apiService = TemplateApiService.getInstance();
-
-  noteTypeRef.current = noteType;
-  selectedTemplateRef.current = selectedTemplate;
 
   const getCurrentContent = useCallback(() => {
     const cardType = noteType.tmpls[selectedCardIndex];
@@ -132,33 +127,10 @@ const MonacoEditorWrapper: React.FC<MonacoEditorWrapperProps> = ({
     [noteType, selectedCardIndex, selectedTemplate, onNoteTypeChange]
   );
 
-  useEffect(() => {
-    if (!editorRef.current) return;
-
-    const model = editorRef.current.getModel();
-    if (!model) return;
-
-    if (selectedTemplate === "css") {
-      monaco.editor.setModelMarkers(model, "template-validator", []);
-      return;
-    }
-
+  const validationErrors = useMemo(() => {
+    if (selectedTemplate === "css") return [];
     const fieldNames = noteType.flds.map((f) => f.name);
-    const content = getCurrentContent();
-    const errors = validateTemplate(content, fieldNames);
-
-    monaco.editor.setModelMarkers(
-      model,
-      "template-validator",
-      errors.map((e) => ({
-        severity: monaco.MarkerSeverity.Error,
-        message: e.message,
-        startLineNumber: e.line,
-        startColumn: e.column,
-        endLineNumber: e.line,
-        endColumn: e.endColumn,
-      }))
-    );
+    return validateTemplate(getCurrentContent(), fieldNames);
   }, [noteType, selectedCardIndex, selectedTemplate, getCurrentContent]);
 
   const generateCopilotSuggestions = useCallback(async (prompt: string) => {
@@ -227,30 +199,10 @@ const MonacoEditorWrapper: React.FC<MonacoEditorWrapperProps> = ({
     });
 
     editor.onDidChangeModelContent(() => {
+      if (!copilotEnabled) return;
+
       const model = editor.getModel();
       if (!model) return;
-
-      if (selectedTemplateRef.current !== "css") {
-        const fieldNames = noteTypeRef.current.flds.map((f) => f.name);
-        const content = model.getValue();
-        const errors = validateTemplate(content, fieldNames);
-        monaco.editor.setModelMarkers(
-          model,
-          "template-validator",
-          errors.map((e) => ({
-            severity: monaco.MarkerSeverity.Error,
-            message: e.message,
-            startLineNumber: e.line,
-            startColumn: e.column,
-            endLineNumber: e.line,
-            endColumn: e.endColumn,
-          }))
-        );
-      } else {
-        monaco.editor.setModelMarkers(model, "template-validator", []);
-      }
-
-      if (!copilotEnabled) return;
 
       const position = editor.getPosition();
       if (!position) return;
@@ -487,6 +439,19 @@ const MonacoEditorWrapper: React.FC<MonacoEditorWrapperProps> = ({
           </div>
         )}
       </div>
+
+      {validationErrors.length > 0 && (
+        <div className={styles.validationErrors}>
+          {validationErrors.map((error, i) => (
+            <div key={i} className={styles.validationError}>
+              <span className={styles.validationErrorLine}>
+                Line {error.line}:
+              </span>
+              {error.message}
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Status Bar */}
       <div className={styles.statusBar}>

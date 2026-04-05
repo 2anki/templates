@@ -3,9 +3,8 @@ import {
   TemplateProject,
   PreviewData,
 } from "../types/AnkiNoteType";
+import { NoteBaseType } from "../types/NoteBaseType";
 import { getBaseURL } from "../features/TemplatePage/helpers/getBaseUrl";
-
-// Mock API service for template management
 class TemplateApiService {
   private static instance: TemplateApiService;
 
@@ -16,20 +15,18 @@ class TemplateApiService {
     return TemplateApiService.instance;
   }
 
-  // Get user's private templates
   async getUserTemplates(): Promise<TemplateProject[]> {
-    // Mock implementation - in real app this would be an API call
     const stored = localStorage.getItem("userTemplates");
     if (stored) {
       return JSON.parse(stored);
     }
 
-    // Return some sample templates for demo
     const sampleTemplates: TemplateProject[] = [
       {
         id: "basic-clean",
         name: "Clean Basic",
         description: "A minimal, clean basic note type",
+        baseType: NoteBaseType.Basic,
         noteType: this.getBasicNoteType(),
         previewData: {
           Front: "What is the capital of France?",
@@ -44,6 +41,7 @@ class TemplateApiService {
         id: "cloze-modern",
         name: "Modern Cloze",
         description: "A stylish cloze deletion template",
+        baseType: NoteBaseType.Cloze,
         noteType: this.getClozeNoteType(),
         previewData: {
           Text: "The capital of {{c1::France}} is {{c2::Paris}}.",
@@ -56,7 +54,6 @@ class TemplateApiService {
       },
     ];
 
-    // Store the sample templates
     localStorage.setItem("userTemplates", JSON.stringify(sampleTemplates));
     return sampleTemplates;
   }
@@ -109,6 +106,7 @@ class TemplateApiService {
       body: JSON.stringify({
         name: template.name,
         description: template.description,
+        baseType: template.baseType,
         noteType: template.noteType,
         previewData: template.previewData,
         tags: template.tags,
@@ -334,6 +332,248 @@ hr {
       `,
       tags: [],
     };
+  }
+
+  getBasicReversedNoteType(): AnkiNoteType {
+    return {
+      id: Date.now() + 2,
+      name: "Basic (and reversed card)",
+      type: 0,
+      mod: Date.now(),
+      usn: -1,
+      sortf: 0,
+      tmpls: [
+        {
+          name: "Card 1",
+          ord: 0,
+          qfmt: '<div class="front">\n  <h1>{{Front}}</h1>\n</div>',
+          afmt: '<div class="back">\n  <div class="question">{{Front}}</div>\n  <hr id="answer">\n  <div class="answer">{{Back}}</div>\n</div>',
+        },
+        {
+          name: "Card 2",
+          ord: 1,
+          qfmt: '<div class="front">\n  <h1>{{Back}}</h1>\n</div>',
+          afmt: '<div class="back">\n  <div class="question">{{Back}}</div>\n  <hr id="answer">\n  <div class="answer">{{Front}}</div>\n</div>',
+        },
+      ],
+      flds: [
+        {
+          name: "Front",
+          ord: 0,
+          sticky: false,
+          rtl: false,
+          font: "Inter",
+          size: 20,
+        },
+        {
+          name: "Back",
+          ord: 1,
+          sticky: false,
+          rtl: false,
+          font: "Inter",
+          size: 20,
+        },
+      ],
+      css: this.getBasicNoteType().css,
+      tags: [],
+    };
+  }
+
+  getBasicOptionalReversedNoteType(): AnkiNoteType {
+    return {
+      id: Date.now() + 3,
+      name: "Basic (optional reversed card)",
+      type: 0,
+      mod: Date.now(),
+      usn: -1,
+      sortf: 0,
+      tmpls: [
+        {
+          name: "Card 1",
+          ord: 0,
+          qfmt: '<div class="front">\n  <h1>{{Front}}</h1>\n</div>',
+          afmt: '<div class="back">\n  <div class="question">{{Front}}</div>\n  <hr id="answer">\n  <div class="answer">{{Back}}</div>\n</div>',
+        },
+        {
+          name: "Card 2",
+          ord: 1,
+          qfmt: '{{#Add Reverse}}<div class="front">\n  <h1>{{Back}}</h1>\n</div>{{/Add Reverse}}',
+          afmt: '{{#Add Reverse}}<div class="back">\n  <div class="question">{{Back}}</div>\n  <hr id="answer">\n  <div class="answer">{{Front}}</div>\n</div>{{/Add Reverse}}',
+        },
+      ],
+      flds: [
+        {
+          name: "Front",
+          ord: 0,
+          sticky: false,
+          rtl: false,
+          font: "Inter",
+          size: 20,
+        },
+        {
+          name: "Back",
+          ord: 1,
+          sticky: false,
+          rtl: false,
+          font: "Inter",
+          size: 20,
+        },
+        {
+          name: "Add Reverse",
+          ord: 2,
+          sticky: false,
+          rtl: false,
+          font: "Inter",
+          size: 20,
+        },
+      ],
+      css: this.getBasicNoteType().css,
+      tags: [],
+    };
+  }
+
+  getBasicTypeAnswerNoteType(): AnkiNoteType {
+    return {
+      id: Date.now() + 4,
+      name: "Basic (type in the answer)",
+      type: 0,
+      mod: Date.now(),
+      usn: -1,
+      sortf: 0,
+      tmpls: [
+        {
+          name: "Card 1",
+          ord: 0,
+          qfmt: '<div class="front">\n  <h1>{{Front}}</h1>\n  {{type:Back}}\n</div>',
+          afmt: '<div class="back">\n  <div class="question">{{Front}}</div>\n  <hr id="answer">\n  <div class="answer">{{Back}}</div>\n  {{type:Back}}\n</div>',
+        },
+      ],
+      flds: [
+        {
+          name: "Front",
+          ord: 0,
+          sticky: false,
+          rtl: false,
+          font: "Inter",
+          size: 20,
+        },
+        {
+          name: "Back",
+          ord: 1,
+          sticky: false,
+          rtl: false,
+          font: "Inter",
+          size: 20,
+        },
+      ],
+      css: this.getBasicNoteType().css,
+      tags: [],
+    };
+  }
+
+  getImageOcclusionNoteType(): AnkiNoteType {
+    return {
+      id: Date.now() + 5,
+      name: "Image Occlusion",
+      type: 0,
+      mod: Date.now(),
+      usn: -1,
+      sortf: 0,
+      tmpls: [
+        {
+          name: "Card 1",
+          ord: 0,
+          qfmt: '<div class="front">\n  {{Image}}\n  <div class="header">{{Header}}</div>\n</div>',
+          afmt: '<div class="back">\n  {{Image}}\n  <div class="header">{{Header}}</div>\n  <div class="extra">{{Back Extra}}</div>\n</div>',
+        },
+      ],
+      flds: [
+        {
+          name: "Image",
+          ord: 0,
+          sticky: false,
+          rtl: false,
+          font: "Inter",
+          size: 20,
+        },
+        {
+          name: "Header",
+          ord: 1,
+          sticky: false,
+          rtl: false,
+          font: "Inter",
+          size: 20,
+        },
+        {
+          name: "Back Extra",
+          ord: 2,
+          sticky: false,
+          rtl: false,
+          font: "Inter",
+          size: 20,
+        },
+        {
+          name: "Comments",
+          ord: 3,
+          sticky: false,
+          rtl: false,
+          font: "Inter",
+          size: 20,
+        },
+      ],
+      css: `
+.card {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 20px;
+  text-align: center;
+  padding: 20px;
+}
+.header { font-size: 1.2rem; font-weight: 600; margin-bottom: 10px; }
+.extra { margin-top: 20px; color: #555; }
+      `,
+      tags: [],
+    };
+  }
+
+  getNoteTypeForBaseType(baseType: NoteBaseType): AnkiNoteType {
+    switch (baseType) {
+      case NoteBaseType.Basic:
+        return this.getBasicNoteType();
+      case NoteBaseType.BasicReversed:
+        return this.getBasicReversedNoteType();
+      case NoteBaseType.BasicOptionalReversed:
+        return this.getBasicOptionalReversedNoteType();
+      case NoteBaseType.BasicTypeAnswer:
+        return this.getBasicTypeAnswerNoteType();
+      case NoteBaseType.Cloze:
+        return this.getClozeNoteType();
+      case NoteBaseType.ImageOcclusion:
+        return this.getImageOcclusionNoteType();
+    }
+  }
+
+  getDefaultPreviewDataForBaseType(
+    baseType: NoteBaseType
+  ): Record<string, string> {
+    switch (baseType) {
+      case NoteBaseType.Cloze:
+        return {
+          Text: "Humans landed on the moon in {{c1::1969}}.",
+          Extra: "",
+        };
+      case NoteBaseType.ImageOcclusion:
+        return {
+          Image: "",
+          Header: "Label the diagram",
+          "Back Extra": "",
+          Comments: "",
+        };
+      default:
+        return {
+          Front: "Sample question",
+          Back: "Sample answer",
+        };
+    }
   }
 }
 

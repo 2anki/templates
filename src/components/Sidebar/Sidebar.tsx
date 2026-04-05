@@ -1,5 +1,6 @@
 import React from "react";
 import { TemplateProject } from "../../types/AnkiNoteType";
+import { NOTE_BASE_TYPE_LABELS } from "../../types/NoteBaseType";
 import styles from "./Sidebar.module.css";
 
 // Simple SVG icons as React components
@@ -125,7 +126,9 @@ const Sidebar: React.FC<SidebarProps> = ({
                     <Icons.File className={styles.itemIcon} />
                     <span className={styles.itemText}>{template.name}</span>
                     <span className={styles.itemMeta}>
-                      {formatDate(template.updatedAt)}
+                      {template.baseType
+                        ? NOTE_BASE_TYPE_LABELS[template.baseType]
+                        : formatDate(template.updatedAt)}
                     </span>
                   </button>
                 </li>

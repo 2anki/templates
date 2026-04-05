@@ -276,7 +276,6 @@ const MonacoEditorWrapper: React.FC<MonacoEditorWrapperProps> = ({
     links: false,
     colorDecorators: false,
     selectionHighlight: false,
-    occurrencesHighlight: "off" as const,
   };
 
   return (

@@ -1,3 +1,5 @@
+import { NoteBaseType } from "./NoteBaseType";
+
 export interface AnkiField {
   name: string;
   ord: number;
@@ -45,6 +47,7 @@ export interface TemplateProject {
   id: string;
   name: string;
   description: string;
+  baseType: NoteBaseType;
   noteType: AnkiNoteType;
   previewData: PreviewData;
   createdAt: string;

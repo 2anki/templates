@@ -4,9 +4,11 @@ import {
   AnkiNoteType,
   PreviewData,
 } from "../../types/AnkiNoteType";
+import { NoteBaseType, NOTE_BASE_TYPE_LABELS } from "../../types/NoteBaseType";
 import TemplateApiService from "../../services/TemplateApiService";
 import Sidebar from "../Sidebar/Sidebar";
 import MonacoEditorWrapper from "../MonacoEditorWrapper/MonacoEditorWrapper";
+import NewTemplateDialog from "../NewTemplateDialog/NewTemplateDialog";
 import styles from "./TemplateEditor.module.css";
 
 // Icons
@@ -57,6 +59,7 @@ const TemplateEditor: React.FC = () => {
   const [tempName, setTempName] = useState("");
   const [isEditingDescription, setIsEditingDescription] = useState(false);
   const [tempDescription, setTempDescription] = useState("");
+  const [showNewTemplateDialog, setShowNewTemplateDialog] = useState(false);
 
   const apiService = TemplateApiService.getInstance();
 
@@ -106,27 +109,29 @@ const TemplateEditor: React.FC = () => {
     }
   }, [selectedTemplate, apiService]);
 
-  const createNewTemplate = useCallback(() => {
-    const newTemplate: TemplateProject = {
-      id: `template-${Date.now()}`,
-      name: "New Template",
-      description: "A new Anki template",
-      noteType: apiService.getBasicNoteType(),
-      previewData: {
-        Front: "Sample front content",
-        Back: "Sample back content",
-      },
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      isShared: false,
-      tags: [],
-    };
+  const createNewTemplate = useCallback(
+    (baseType: NoteBaseType) => {
+      const newTemplate: TemplateProject = {
+        id: `template-${Date.now()}`,
+        name: `New ${NOTE_BASE_TYPE_LABELS[baseType]}`,
+        description: `A custom ${NOTE_BASE_TYPE_LABELS[baseType]} template`,
+        baseType,
+        noteType: apiService.getNoteTypeForBaseType(baseType),
+        previewData: apiService.getDefaultPreviewDataForBaseType(baseType),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        isShared: false,
+        tags: [],
+      };
 
-    setUserTemplates((prev) => [...prev, newTemplate]);
-    setSelectedTemplate(newTemplate);
-    setSelectedCardIndex(0);
-    setSelectedTemplateType("qfmt");
-  }, [apiService]);
+      setUserTemplates((prev) => [...prev, newTemplate]);
+      setSelectedTemplate(newTemplate);
+      setSelectedCardIndex(0);
+      setSelectedTemplateType("qfmt");
+      setShowNewTemplateDialog(false);
+    },
+    [apiService]
+  );
 
   const handleSelectTemplate = useCallback((template: TemplateProject) => {
     setSelectedTemplate(template);
@@ -332,13 +337,20 @@ const TemplateEditor: React.FC = () => {
         sharedTemplates={sharedTemplates}
         selectedTemplateId={selectedTemplate?.id || null}
         onSelectTemplate={handleSelectTemplate}
-        onCreateNew={createNewTemplate}
+        onCreateNew={() => setShowNewTemplateDialog(true)}
         onDeleteTemplate={handleDeleteTemplate}
         onOpenMarketplace={() => {
           const webUrl = import.meta.env.VITE_WEB_URL ?? "https://2anki.net";
           window.open(`${webUrl}/marketplace`, "_blank", "noopener,noreferrer");
         }}
       />
+
+      {showNewTemplateDialog && (
+        <NewTemplateDialog
+          onSelect={createNewTemplate}
+          onCancel={() => setShowNewTemplateDialog(false)}
+        />
+      )}
 
       <div className={styles.mainContent}>
         {selectedTemplate ? (
@@ -404,22 +416,29 @@ const TemplateEditor: React.FC = () => {
                       </div>
                     </div>
                   ) : (
-                    <p
-                      className={`${styles.projectDescription} ${
-                        !selectedTemplate.isShared ? styles.editable : ""
-                      }`}
-                      onClick={startEditingDescription}
-                      title={
-                        !selectedTemplate.isShared
-                          ? "Click to edit template description"
-                          : "Template description (read-only)"
-                      }
-                    >
-                      {selectedTemplate.description}
-                      {lastSaved && (
-                        <span> • Saved {lastSaved.toLocaleTimeString()}</span>
+                    <>
+                      <p
+                        className={`${styles.projectDescription} ${
+                          !selectedTemplate.isShared ? styles.editable : ""
+                        }`}
+                        onClick={startEditingDescription}
+                        title={
+                          !selectedTemplate.isShared
+                            ? "Click to edit template description"
+                            : "Template description (read-only)"
+                        }
+                      >
+                        {selectedTemplate.description}
+                        {lastSaved && (
+                          <span> • Saved {lastSaved.toLocaleTimeString()}</span>
+                        )}
+                      </p>
+                      {selectedTemplate.baseType && (
+                        <span className={styles.baseTypeTag}>
+                          {NOTE_BASE_TYPE_LABELS[selectedTemplate.baseType]}
+                        </span>
                       )}
-                    </p>
+                    </>
                   )}
                 </div>
               </div>
@@ -564,7 +583,10 @@ const TemplateEditor: React.FC = () => {
               Notion-inspired editor. Start by creating a new template or
               exploring shared templates from the community.
             </p>
-            <button className={styles.createButton} onClick={createNewTemplate}>
+            <button
+              className={styles.createButton}
+              onClick={() => setShowNewTemplateDialog(true)}
+            >
               <Icons.Plus className={styles.actionIcon} />
               Create Your First Template
             </button>

@@ -243,6 +243,28 @@
   color: #6b7280;
 }
 
+.deleteFieldButton {
+  margin-left: auto;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #9ca3af;
+  font-size: 14px;
+  padding: 2px 4px;
+  line-height: 1;
+  border-radius: 4px;
+}
+
+.deleteFieldButton:hover:not(:disabled) {
+  color: #ef4444;
+  background: #fee2e2;
+}
+
+.deleteFieldButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
 .fieldInput {
   width: 100%;
   padding: 8px 12px;

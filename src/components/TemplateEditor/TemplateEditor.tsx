@@ -199,6 +199,19 @@ const TemplateEditor: React.FC = () => {
     });
   }, [selectedTemplate, handleNoteTypeChange]);
 
+  const handleDeleteField = useCallback(
+    (fieldName: string) => {
+      if (!selectedTemplate) return;
+      handleNoteTypeChange({
+        ...selectedTemplate.noteType,
+        flds: selectedTemplate.noteType.flds
+          .filter((f) => f.name !== fieldName)
+          .map((f, i) => ({ ...f, ord: i })),
+      });
+    },
+    [selectedTemplate, handleNoteTypeChange]
+  );
+
   const handlePreviewDataChange = useCallback(
     (previewData: PreviewData) => {
       if (!selectedTemplate) return;
@@ -518,9 +531,14 @@ const TemplateEditor: React.FC = () => {
                     <div key={index} className={styles.fieldItem}>
                       <div className={styles.fieldItemHeader}>
                         <span className={styles.fieldName}>{field.name}</span>
-                        <span className={styles.fieldMeta}>
-                          {field.font} • {field.size}px
-                        </span>
+                        <button
+                          className={styles.deleteFieldButton}
+                          onClick={() => handleDeleteField(field.name)}
+                          disabled={selectedTemplate.isShared}
+                          title={`Delete ${field.name}`}
+                        >
+                          ✕
+                        </button>
                       </div>
                       <textarea
                         className={styles.fieldInput}

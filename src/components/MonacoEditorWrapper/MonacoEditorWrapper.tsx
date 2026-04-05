@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback, useMemo } from "react";
+import React, { useRef, useCallback, useMemo } from "react";
 import Editor from "@monaco-editor/react";
 import * as monaco from "monaco-editor";
 import { AnkiNoteType, PreviewData } from "../../types/AnkiNoteType";
@@ -51,13 +51,6 @@ const Icons = {
   ),
 };
 
-interface CopilotSuggestion {
-  id: string;
-  text: string;
-  description: string;
-  confidence: number;
-}
-
 interface MonacoEditorWrapperProps {
   noteType: AnkiNoteType;
   selectedCardIndex: number;
@@ -75,13 +68,7 @@ const MonacoEditorWrapper: React.FC<MonacoEditorWrapperProps> = ({
   onNoteTypeChange,
   onPreviewDataChange,
 }) => {
-  const [showSplitView, setShowSplitView] = useState(true);
-  const [showCopilotPanel, setShowCopilotPanel] = useState(false);
-  const [copilotSuggestions, setCopilotSuggestions] = useState<
-    CopilotSuggestion[]
-  >([]);
-  const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
-  const [copilotEnabled] = useState(true);
+  const [showSplitView] = [true];
 
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
   const apiService = TemplateApiService.getInstance();
@@ -133,94 +120,14 @@ const MonacoEditorWrapper: React.FC<MonacoEditorWrapperProps> = ({
     return validateTemplate(getCurrentContent(), fieldNames);
   }, [noteType, selectedCardIndex, selectedTemplate, getCurrentContent]);
 
-  const generateCopilotSuggestions = useCallback(async (prompt: string) => {
-    setIsLoadingSuggestions(true);
-    // Mock Copilot suggestions - in a real app, this would call an AI API
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-
-    const mockSuggestions: CopilotSuggestion[] = [
-      {
-        id: "1",
-        text: `<div class="flashcard-front">
-  <h2>{{Question}}</h2>
-  <p class="hint">{{Hint}}</p>
-</div>`,
-        description: "Clean flashcard front template with hint",
-        confidence: 0.95,
-      },
-      {
-        id: "2",
-        text: `<div class="flashcard-back">
-  <div class="question">{{Question}}</div>
-  <hr>
-  <div class="answer">{{Answer}}</div>
-  <div class="extra">{{Extra}}</div>
-</div>`,
-        description: "Standard back template with extra field",
-        confidence: 0.88,
-      },
-      {
-        id: "3",
-        text: `.card {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  max-width: 600px;
-  margin: 20px auto;
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-}`,
-        description: "Modern gradient card styling",
-        confidence: 0.82,
-      },
-    ];
-
-    setCopilotSuggestions(mockSuggestions);
-    setIsLoadingSuggestions(false);
-    setShowCopilotPanel(true);
-  }, []);
-
   const handleEditorDidMount = (
     editor: monaco.editor.IStandaloneCodeEditor
   ) => {
     editorRef.current = editor;
 
-    // Set up Copilot-style suggestions
-    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Space, () => {
-      if (copilotEnabled) {
-        const position = editor.getPosition();
-        const model = editor.getModel();
-        if (position && model) {
-          const lineContent = model.getLineContent(position.lineNumber);
-          generateCopilotSuggestions(lineContent);
-        }
-      }
-    });
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Space, () => {});
 
-    editor.onDidChangeModelContent(() => {
-      if (!copilotEnabled) return;
-
-      const model = editor.getModel();
-      if (!model) return;
-
-      const position = editor.getPosition();
-      if (!position) return;
-
-      const lineContent = model.getLineContent(position.lineNumber);
-
-      if (
-        lineContent.includes("// Generate") ||
-        lineContent.includes("<!-- Generate")
-      ) {
-        generateCopilotSuggestions(lineContent);
-      }
-    });
-  };
-
-  const applySuggestion = (suggestion: CopilotSuggestion) => {
-    updateContent(suggestion.text);
-    setShowCopilotPanel(false);
+    editor.onDidChangeModelContent(() => {});
   };
 
   const insertFormatting = (format: string) => {
@@ -315,31 +222,6 @@ const MonacoEditorWrapper: React.FC<MonacoEditorWrapperProps> = ({
         </div>
 
         <div className={styles.toolbarSeparator} />
-
-        <div className={styles.toolbarGroup}>
-          <button
-            className={`${styles.toolbarButton} ${styles.primaryButton}`}
-            onClick={() => generateCopilotSuggestions("Generate template")}
-            disabled={!copilotEnabled}
-            title="Generate template code with AI (Ctrl+Space)"
-          >
-            <Icons.Sparkles
-              className={`${styles.buttonIcon} ${styles.sparklesIcon}`}
-            />
-            Generate
-          </button>
-
-          <button
-            className={`${styles.toolbarButton} ${styles.primaryButton} ${
-              showSplitView ? styles.active : ""
-            }`}
-            onClick={() => setShowSplitView(!showSplitView)}
-            title={showSplitView ? "Hide preview panel" : "Show live preview"}
-          >
-            <Icons.SplitView className={styles.buttonIcon} />
-            Preview
-          </button>
-        </div>
       </div>
 
       {/* Editor and Preview */}
@@ -388,56 +270,6 @@ const MonacoEditorWrapper: React.FC<MonacoEditorWrapperProps> = ({
             className={styles.monacoEditor}
           />
         )}
-
-        {/* Copilot Panel */}
-        {showCopilotPanel && (
-          <div className={styles.copilotPanel}>
-            <div className={styles.copilotHeader}>
-              <h3 className={styles.copilotTitle}>AI Suggestions</h3>
-              <button
-                className={styles.closeButton}
-                onClick={() => setShowCopilotPanel(false)}
-              >
-                <Icons.Close />
-              </button>
-            </div>
-
-            {isLoadingSuggestions ? (
-              <div className={styles.loadingSpinner}>
-                <div className={styles.spinner} />
-                Generating suggestions...
-              </div>
-            ) : (
-              <div className={styles.suggestionsList}>
-                {copilotSuggestions.map((suggestion) => (
-                  <div
-                    key={suggestion.id}
-                    className={styles.suggestionItem}
-                    onClick={() => applySuggestion(suggestion)}
-                  >
-                    <div className={styles.suggestionItemHeader}>
-                      <span className={styles.suggestionLabel}>
-                        {suggestion.description}
-                      </span>
-                      <button
-                        className={styles.acceptButton}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          applySuggestion(suggestion);
-                        }}
-                      >
-                        Accept
-                      </button>
-                    </div>
-                    <pre className={styles.suggestionCode}>
-                      {suggestion.text}
-                    </pre>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
       </div>
 
       {validationErrors.length > 0 && (
@@ -462,16 +294,6 @@ const MonacoEditorWrapper: React.FC<MonacoEditorWrapperProps> = ({
           <span>
             {noteType.flds.length} fields • {noteType.tmpls.length} cards
           </span>
-        </div>
-        <div className={styles.statusRight}>
-          <div className={styles.copilotStatus}>
-            <div
-              className={`${styles.statusDot} ${
-                copilotEnabled ? "" : styles.offline
-              }`}
-            />
-            Copilot {copilotEnabled ? "ready" : "offline"}
-          </div>
         </div>
       </div>
     </div>

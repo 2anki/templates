@@ -84,7 +84,12 @@ const MonacoEditorWrapper: React.FC<MonacoEditorWrapperProps> = ({
   const [copilotEnabled] = useState(true);
 
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
+  const noteTypeRef = useRef(noteType);
+  const selectedTemplateRef = useRef(selectedTemplate);
   const apiService = TemplateApiService.getInstance();
+
+  noteTypeRef.current = noteType;
+  selectedTemplateRef.current = selectedTemplate;
 
   const getCurrentContent = useCallback(() => {
     const cardType = noteType.tmpls[selectedCardIndex];
@@ -221,17 +226,37 @@ const MonacoEditorWrapper: React.FC<MonacoEditorWrapperProps> = ({
       }
     });
 
-    // Auto-trigger suggestions for comment-style prompts
     editor.onDidChangeModelContent(() => {
       const model = editor.getModel();
-      if (!model || !copilotEnabled) return;
+      if (!model) return;
+
+      if (selectedTemplateRef.current !== "css") {
+        const fieldNames = noteTypeRef.current.flds.map((f) => f.name);
+        const content = model.getValue();
+        const errors = validateTemplate(content, fieldNames);
+        monaco.editor.setModelMarkers(
+          model,
+          "template-validator",
+          errors.map((e) => ({
+            severity: monaco.MarkerSeverity.Error,
+            message: e.message,
+            startLineNumber: e.line,
+            startColumn: e.column,
+            endLineNumber: e.line,
+            endColumn: e.endColumn,
+          }))
+        );
+      } else {
+        monaco.editor.setModelMarkers(model, "template-validator", []);
+      }
+
+      if (!copilotEnabled) return;
 
       const position = editor.getPosition();
       if (!position) return;
 
       const lineContent = model.getLineContent(position.lineNumber);
 
-      // Check for comment-style prompts
       if (
         lineContent.includes("// Generate") ||
         lineContent.includes("<!-- Generate")

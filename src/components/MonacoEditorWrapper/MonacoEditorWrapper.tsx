@@ -130,40 +130,6 @@ const MonacoEditorWrapper: React.FC<MonacoEditorWrapperProps> = ({
     editor.onDidChangeModelContent(() => {});
   };
 
-  const insertFormatting = (format: string) => {
-    if (!editorRef.current) return;
-
-    const editor = editorRef.current;
-    const selection = editor.getSelection();
-    const model = editor.getModel();
-
-    if (!selection || !model) return;
-
-    let insertText = "";
-
-    switch (format) {
-      case "bold":
-        insertText = "**bold text**";
-        break;
-      case "italic":
-        insertText = "*italic text*";
-        break;
-      case "image":
-        insertText =
-          '<img src="{{Image}}" alt="Image" style="max-width: 100%;" />';
-        break;
-      default:
-        return;
-    }
-
-    editor.executeEdits("", [
-      {
-        range: selection,
-        text: insertText,
-      },
-    ]);
-  };
-
   const generatePreviewHtml = () => {
     return apiService.generatePreview(
       noteType,
@@ -193,37 +159,6 @@ const MonacoEditorWrapper: React.FC<MonacoEditorWrapperProps> = ({
 
   return (
     <div className={styles.editorContainer}>
-      {/* Toolbar */}
-      <div className={styles.toolbar}>
-        <div className={styles.toolbarGroup}>
-          <button
-            className={styles.toolbarButton}
-            onClick={() => insertFormatting("bold")}
-            title="Bold"
-          >
-            <Icons.Bold className={styles.buttonIcon} />
-          </button>
-
-          <button
-            className={styles.toolbarButton}
-            onClick={() => insertFormatting("italic")}
-            title="Italic"
-          >
-            <Icons.Italic className={styles.buttonIcon} />
-          </button>
-
-          <button
-            className={styles.toolbarButton}
-            onClick={() => insertFormatting("image")}
-            title="Insert Image"
-          >
-            <Icons.Image className={styles.buttonIcon} />
-          </button>
-        </div>
-
-        <div className={styles.toolbarSeparator} />
-      </div>
-
       {/* Editor and Preview */}
       <div className={styles.editorWrapper}>
         {showSplitView ? (

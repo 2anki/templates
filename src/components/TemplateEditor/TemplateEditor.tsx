@@ -169,18 +169,24 @@ const TemplateEditor: React.FC = () => {
   const handleDeleteTemplate = useCallback(
     async (templateId: string) => {
       try {
-        await apiService.deleteTemplate(templateId);
+        const allTemplates = [...userTemplates, ...sharedTemplates];
+        const template = allTemplates.find((t) => t.id === templateId);
+        await apiService.deleteTemplate(templateId, template);
+
         setUserTemplates((prev) => prev.filter((t) => t.id !== templateId));
+        setSharedTemplates((prev) => prev.filter((t) => t.id !== templateId));
 
         if (selectedTemplate?.id === templateId) {
-          const remaining = userTemplates.filter((t) => t.id !== templateId);
+          const remaining = [...userTemplates, ...sharedTemplates].filter(
+            (t) => t.id !== templateId
+          );
           setSelectedTemplate(remaining.length > 0 ? remaining[0] : null);
         }
       } catch (error) {
         console.error("Failed to delete template:", error);
       }
     },
-    [apiService, selectedTemplate, userTemplates]
+    [apiService, selectedTemplate, userTemplates, sharedTemplates]
   );
 
   const handleNoteTypeChange = useCallback(

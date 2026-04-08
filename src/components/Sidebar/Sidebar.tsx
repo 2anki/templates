@@ -225,6 +225,31 @@ const Sidebar: React.FC<SidebarProps> = ({
                             <span className={styles.itemText}>
                               {template.name}
                             </span>
+                            <span
+                              className={styles.deleteButton}
+                              role="button"
+                              tabIndex={0}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (
+                                  window.confirm(`Delete "${template.name}"?`)
+                                ) {
+                                  onDeleteTemplate(template.id);
+                                }
+                              }}
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter") {
+                                  e.stopPropagation();
+                                  if (
+                                    window.confirm(`Delete "${template.name}"?`)
+                                  ) {
+                                    onDeleteTemplate(template.id);
+                                  }
+                                }
+                              }}
+                            >
+                              <Icons.Trash className={styles.deleteIcon} />
+                            </span>
                           </button>
                         </li>
                       ))}
@@ -271,6 +296,29 @@ const Sidebar: React.FC<SidebarProps> = ({
                         <span className={styles.itemMeta}>
                           {template.ownerName}
                         </span>
+                        <span
+                          className={styles.deleteButton}
+                          role="button"
+                          tabIndex={0}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (window.confirm(`Delete "${template.name}"?`)) {
+                              onDeleteTemplate(template.id);
+                            }
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              e.stopPropagation();
+                              if (
+                                window.confirm(`Delete "${template.name}"?`)
+                              ) {
+                                onDeleteTemplate(template.id);
+                              }
+                            }
+                          }}
+                        >
+                          <Icons.Trash className={styles.deleteIcon} />
+                        </span>
                       </button>
                     </li>
                   ))}
@@ -283,22 +331,6 @@ const Sidebar: React.FC<SidebarProps> = ({
             <button className={styles.footerButton} onClick={onOpenMarketplace}>
               <Icons.Store className={styles.itemIcon} />
               Marketplace
-            </button>
-
-            <button
-              className={styles.footerButton}
-              onClick={() => {
-                if (
-                  selectedTemplateId &&
-                  window.confirm("Delete this template?")
-                ) {
-                  onDeleteTemplate(selectedTemplateId);
-                }
-              }}
-              disabled={!selectedTemplateId}
-            >
-              <Icons.Trash className={styles.itemIcon} />
-              Delete
             </button>
           </div>
         </>

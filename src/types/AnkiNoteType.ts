@@ -53,6 +53,7 @@ export interface TemplateProject {
   createdAt: string;
   updatedAt: string;
   isShared: boolean;
+  isDefault?: boolean;
   ownerName?: string;
   tags: string[];
 }

@@ -131,6 +131,33 @@
   margin-left: 8px;
 }
 
+.deleteButton {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+  padding: 2px;
+  border-radius: 4px;
+  cursor: pointer;
+  flex-shrink: 0;
+  color: var(--color-text-muted);
+  transition: all var(--transition-fast);
+}
+
+.sidebarLink:hover .deleteButton {
+  display: flex;
+}
+
+.deleteButton:hover {
+  color: #ef4444;
+  background: #fef2f2;
+}
+
+.deleteIcon {
+  width: 13px;
+  height: 13px;
+}
+
 .generateButton {
   display: flex;
   align-items: center;

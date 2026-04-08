@@ -87,7 +87,10 @@ class TemplateApiService {
     try {
       const response = await fetch(`${getBaseURL()}/api/templates/public`);
       if (!response.ok) return [];
-      return response.json();
+      const all: TemplateProject[] = await response.json();
+      const defaults = await this.fetchDefaultTemplates();
+      const defaultIds = new Set(defaults.map((t) => t.id));
+      return all.filter((t) => !defaultIds.has(t.id));
     } catch {
       return [];
     }

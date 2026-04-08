@@ -15,9 +15,44 @@ class TemplateApiService {
     return TemplateApiService.instance;
   }
 
+  private loggedIn: boolean | null = null;
+
+  private async isLoggedIn(): Promise<boolean> {
+    if (this.loggedIn !== null) return this.loggedIn;
+    try {
+      const response = await fetch(`${getBaseURL()}/api/templates/user`, {
+        credentials: "include",
+      });
+      this.loggedIn = response.ok;
+      if (response.ok) {
+        const data = await response.json();
+        this.serverData = data;
+      }
+      return this.loggedIn;
+    } catch {
+      this.loggedIn = false;
+      return false;
+    }
+  }
+
+  private serverData: {
+    templates: TemplateProject[];
+    hiddenIds: string[];
+  } | null = null;
+
+  private async syncToServer(): Promise<void> {
+    if (!this.serverData) return;
+    await fetch(`${getBaseURL()}/api/templates/user`, {
+      method: "PUT",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(this.serverData),
+    });
+  }
+
   async getUserTemplates(): Promise<TemplateProject[]> {
     const defaultTemplates = await this.fetchDefaultTemplates();
-    const userTemplates = this.getUserCreatedTemplates();
+    const userTemplates = await this.getUserCreatedTemplates();
     return [...defaultTemplates, ...userTemplates];
   }
 
@@ -26,7 +61,7 @@ class TemplateApiService {
       const response = await fetch(`${getBaseURL()}/api/templates/defaults`);
       if (!response.ok) return [];
       const defaults = await response.json();
-      const hidden = this.getHiddenTemplateIds();
+      const hidden = await this.getHiddenTemplateIds();
       return defaults
         .map((t: any) => ({
           ...t,
@@ -41,27 +76,49 @@ class TemplateApiService {
     }
   }
 
-  private getHiddenTemplateIds(): string[] {
+  private async getHiddenTemplateIds(): Promise<string[]> {
+    if (await this.isLoggedIn()) {
+      return this.serverData?.hiddenIds || [];
+    }
     const stored = localStorage.getItem("hiddenTemplateIds");
     if (!stored) return [];
     return JSON.parse(stored);
   }
 
-  private hideTemplate(templateId: string): void {
-    const hidden = this.getHiddenTemplateIds();
+  private async hideTemplate(templateId: string): Promise<void> {
+    if (await this.isLoggedIn()) {
+      if (!this.serverData) this.serverData = { templates: [], hiddenIds: [] };
+      if (!this.serverData.hiddenIds.includes(templateId)) {
+        this.serverData.hiddenIds.push(templateId);
+      }
+      await this.syncToServer();
+      return;
+    }
+    const hidden = await this.getHiddenTemplateIds();
     if (!hidden.includes(templateId)) {
       hidden.push(templateId);
       localStorage.setItem("hiddenTemplateIds", JSON.stringify(hidden));
     }
   }
 
-  private getUserCreatedTemplates(): TemplateProject[] {
+  private async getUserCreatedTemplates(): Promise<TemplateProject[]> {
+    if (await this.isLoggedIn()) {
+      return this.serverData?.templates || [];
+    }
     const stored = localStorage.getItem("userCreatedTemplates");
     if (!stored) return [];
     return JSON.parse(stored);
   }
 
-  private saveUserCreatedTemplates(templates: TemplateProject[]): void {
+  private async saveUserCreatedTemplates(
+    templates: TemplateProject[]
+  ): Promise<void> {
+    if (await this.isLoggedIn()) {
+      if (!this.serverData) this.serverData = { templates: [], hiddenIds: [] };
+      this.serverData.templates = templates;
+      await this.syncToServer();
+      return;
+    }
     localStorage.setItem("userCreatedTemplates", JSON.stringify(templates));
   }
 
@@ -77,7 +134,7 @@ class TemplateApiService {
   }
 
   async saveTemplate(template: TemplateProject): Promise<void> {
-    const userTemplates = this.getUserCreatedTemplates();
+    const userTemplates = await this.getUserCreatedTemplates();
     const existingIndex = userTemplates.findIndex((t) => t.id === template.id);
 
     if (existingIndex >= 0) {
@@ -101,18 +158,18 @@ class TemplateApiService {
     template?: TemplateProject
   ): Promise<void> {
     if (template?.isDefault) {
-      this.hideTemplate(templateId);
+      await this.hideTemplate(templateId);
       return;
     }
 
     if (template?.isShared) {
-      this.hideTemplate(templateId);
+      await this.hideTemplate(templateId);
       return;
     }
 
-    const userTemplates = this.getUserCreatedTemplates();
+    const userTemplates = await this.getUserCreatedTemplates();
     const filtered = userTemplates.filter((t) => t.id !== templateId);
-    this.saveUserCreatedTemplates(filtered);
+    await this.saveUserCreatedTemplates(filtered);
   }
 
   // Publish template to the public marketplace
@@ -454,11 +511,9 @@ hr {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: 20px;
   text-align: center;
-  color: #1f2937;
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  background-size: cover;
-  background-repeat: no-repeat;
-  min-height: 100vh;
+  color: #ffffff;
+  background: linear-gradient(135deg, #1e3a5f 0%, #0f2027 100%);
+  min-height: 100%;
   padding: 40px;
   margin: 0;
   box-sizing: border-box;
@@ -469,27 +524,28 @@ hr {
 }
 
 .cloze-question, .cloze-answer {
-  color: white;
-  line-height: 1.6;
+  color: #e2e8f0;
+  line-height: 1.8;
+  font-size: 1.3rem;
 }
 
 .cloze {
-  font-weight: bold;
-  background: rgba(255, 255, 255, 0.2);
-  color: #fbbf24;
-  padding: 4px 8px;
+  font-weight: 700;
+  background: rgba(99, 179, 237, 0.2);
+  color: #63b3ed;
+  padding: 4px 10px;
   border-radius: 6px;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  border-bottom: 2px solid #63b3ed;
 }
 
 .extra {
   margin-top: 30px;
   padding: 20px;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.08);
   border-radius: 12px;
   font-size: 16px;
-  color: rgba(255, 255, 255, 0.9);
-  border-left: 4px solid #fbbf24;
+  color: rgba(255, 255, 255, 0.75);
+  border-left: 4px solid #63b3ed;
 }
       `,
       tags: [],

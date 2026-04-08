@@ -80,6 +80,7 @@ interface SidebarProps {
   onCreateNew: () => void;
   onDeleteTemplate: (templateId: string) => void;
   onOpenMarketplace: () => void;
+  onGenerateWithAI: () => void;
   isCollapsed: boolean;
   onToggleCollapse: () => void;
 }
@@ -92,6 +93,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   onCreateNew,
   onDeleteTemplate,
   onOpenMarketplace,
+  onGenerateWithAI,
   isCollapsed,
   onToggleCollapse,
 }) => {
@@ -162,6 +164,14 @@ const Sidebar: React.FC<SidebarProps> = ({
       {!isCollapsed && (
         <>
           <div className={styles.sidebarContent}>
+            <button
+              className={styles.generateButton}
+              onClick={onGenerateWithAI}
+            >
+              <span className={styles.generateIcon}>✨</span>
+              Generate with AI
+            </button>
+
             {/* Search */}
             <div className={styles.searchContainer}>
               <input

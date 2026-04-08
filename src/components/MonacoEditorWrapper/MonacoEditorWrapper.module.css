@@ -2,9 +2,10 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  background: var(--color-bg-white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-border-light);
   overflow: hidden;
 }
 
@@ -24,10 +25,10 @@
   align-items: center;
   justify-content: space-between;
   padding: 6px 16px;
-  background: #f8f9fa;
-  border-top: 1px solid #e5e7eb;
-  font-size: 12px;
-  color: #9ca3af;
+  background: var(--color-bg);
+  border-top: 1px solid var(--color-border-light);
+  font-size: 11px;
+  color: var(--color-text-muted);
   flex-shrink: 0;
 }
 
@@ -46,93 +47,130 @@
 .resetCssButton {
   padding: 3px 10px;
   background: none;
-  border: 1px solid #e5e7eb;
-  border-radius: 4px;
-  color: #6b7280;
-  font-size: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-muted);
+  font-size: 11px;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all var(--transition-fast);
 }
 
 .resetCssButton:hover {
-  background: #f3f4f6;
-  border-color: #d1d5db;
-  color: #374151;
+  background: var(--color-bg);
+  border-color: var(--color-border);
+  color: var(--color-text-secondary);
 }
 
-/* Split view */
 .splitView {
   display: flex;
   width: 100%;
-  height: 100%;
-  min-height: 500px;
+  flex: 1;
+  min-height: 0;
 }
 
 .editorPane {
   flex: 1;
   min-width: 0;
-  border-right: 1px solid #e5e7eb;
+  border-right: 1px solid var(--color-border-light);
   display: flex;
   flex-direction: column;
 }
 
 .previewPane {
-  width: 340px;
+  width: 360px;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  background: white;
+  background: var(--color-bg-white);
   overflow-y: auto;
+  min-height: 0;
+}
+
+.previewPaneFullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  width: 100% !important;
+  background: var(--color-bg);
 }
 
 .previewHeader {
-  padding: 8px 12px 8px 14px;
-  border-bottom: 1px solid #e5e7eb;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--color-border-light);
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: #9ca3af;
+  color: var(--color-text-muted);
   position: sticky;
   top: 0;
   z-index: 1;
-  background: white;
+  background: var(--color-bg-white);
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-shrink: 0;
 }
 
+.previewActions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.fullscreenButton {
+  background: none;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  padding: 4px 6px;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  transition: all var(--transition-fast);
+}
+
+.fullscreenButton:hover {
+  color: var(--color-primary);
+  background: var(--color-bg);
+  border-color: var(--color-border-light);
+}
+
 .previewContent {
   flex: 1;
-  padding: 20px 16px 24px;
-  background: #f5f6f8;
+  padding: 24px 20px 32px;
+  background: var(--color-bg);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 16px;
+  min-height: 0;
 }
 
-/* Landscape ratio — matches Anki reviewer */
 .previewCard {
   width: 100%;
-  aspect-ratio: 4/3;
-  background: white;
-  border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.06);
+  flex: 1;
+  min-height: 200px;
+  background: var(--color-bg-white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md), 0 0 0 1px var(--color-border-light);
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  transition: box-shadow var(--transition-normal);
 }
 
-/* Realistic phone frame */
+.previewCard:hover {
+  box-shadow: var(--shadow-lg), 0 0 0 1px var(--color-border-light);
+}
+
 .previewCardMobile {
   width: 220px;
   aspect-ratio: 9/19;
-  background: white;
-  border-radius: 24px;
-  border: 8px solid #1f2937;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  background: var(--color-bg-white);
+  border-radius: 28px;
+  border: 6px solid var(--color-text);
+  box-shadow: var(--shadow-lg);
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -145,23 +183,23 @@
   width: 26px;
   height: 22px;
   background: none;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--color-border-light);
   border-radius: 4px;
-  color: #9ca3af;
+  color: var(--color-text-muted);
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all var(--transition-fast);
 }
 
 .mobileToggleButton:hover {
-  background: #f3f4f6;
-  border-color: #d1d5db;
-  color: #6b7280;
+  background: var(--color-bg);
+  border-color: var(--color-border);
+  color: var(--color-text-secondary);
 }
 
 .mobileToggleActive {
-  background: #eff6ff;
-  border-color: #3b82f6;
-  color: #3b82f6;
+  background: var(--color-primary-light);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
 }
 
 .previewIframe {
@@ -171,35 +209,106 @@
   flex: 1;
 }
 
-.previewSecondary {
-  width: 100%;
+.cardFlipWrapper .previewIframe {
+  pointer-events: none;
 }
 
-.previewSecondaryLabel {
-  font-size: 10px;
-  font-weight: 600;
-  color: #c4c9d4;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  margin-bottom: 6px;
+.cardFlipWrapper {
+  width: 100%;
+  flex: 1;
+  min-height: 200px;
+  perspective: 1200px;
+  cursor: pointer;
 }
 
-.previewCardSmall {
+.cardFlipWrapperMobile {
+  width: 220px;
+  aspect-ratio: 9/19;
+  perspective: 1200px;
+  cursor: pointer;
+}
+
+.cardFlipInner {
+  position: relative;
   width: 100%;
-  height: 130px;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.05);
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.cardFlipped {
+  transform: rotateY(180deg);
+}
+
+.cardFace {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  border-radius: var(--radius-lg);
   overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  opacity: 0.8;
+  background: var(--color-bg-white);
+  box-shadow: var(--shadow-md), 0 0 0 1px var(--color-border-light);
+}
+
+.cardFaceBack {
+  transform: rotateY(180deg);
+}
+
+.flipHint {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  user-select: none;
+  opacity: 0.6;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+}
+
+.flipHint:hover {
+  opacity: 1;
+  color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+
+.resizeHandle {
+  width: 4px;
+  flex-shrink: 0;
+  cursor: col-resize;
+  background: transparent;
+  transition: background var(--transition-fast);
+  position: relative;
+}
+
+.resizeHandle::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 2px;
+  height: 24px;
+  background: var(--color-border);
+  border-radius: 1px;
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.resizeHandle:hover::after {
+  opacity: 1;
+}
+
+.resizeHandle:hover,
+.resizeHandle:active {
+  background: var(--color-primary-light);
 }
 
 .validationErrors {
   padding: 8px 16px;
   background: #fef2f2;
-  border-top: 1px solid #fca5a5;
+  border-top: 1px solid #fecaca;
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -209,7 +318,7 @@
 
 .validationError {
   font-size: 12px;
-  color: #b91c1c;
+  color: var(--color-danger);
   display: flex;
   gap: 6px;
 }

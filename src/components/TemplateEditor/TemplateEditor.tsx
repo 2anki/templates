@@ -10,6 +10,8 @@ import { validateTemplate } from "../../lib/validateTemplate";
 import Sidebar from "../Sidebar/Sidebar";
 import MonacoEditorWrapper from "../MonacoEditorWrapper/MonacoEditorWrapper";
 import NewTemplateDialog from "../NewTemplateDialog/NewTemplateDialog";
+import AIGenerateDialog from "../AIGenerateDialog/AIGenerateDialog";
+import type { GeneratedTemplate } from "../AIGenerateDialog/AIGenerateDialog";
 import styles from "./TemplateEditor.module.css";
 
 // Icons
@@ -61,6 +63,7 @@ const TemplateEditor: React.FC = () => {
   const [isEditingDescription, setIsEditingDescription] = useState(false);
   const [tempDescription, setTempDescription] = useState("");
   const [showNewTemplateDialog, setShowNewTemplateDialog] = useState(false);
+  const [showAIDialog, setShowAIDialog] = useState(false);
   const [exportErrors, setExportErrors] = useState<string[]>([]);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isFieldsExpanded, setIsFieldsExpanded] = useState(true);
@@ -394,6 +397,56 @@ const TemplateEditor: React.FC = () => {
     }
   }, [selectedTemplate, apiService]);
 
+  const handleAIGenerated = useCallback(
+    (generated: GeneratedTemplate) => {
+      const baseType =
+        generated.baseType === "cloze"
+          ? NoteBaseType.Cloze
+          : NoteBaseType.Basic;
+      const baseNoteType = apiService.getNoteTypeForBaseType(baseType);
+
+      const noteType: AnkiNoteType = {
+        ...baseNoteType,
+        name: generated.name,
+        css: generated.css,
+        flds: generated.fields.map((f, i) => ({
+          name: f.name,
+          ord: i,
+          sticky: false,
+          rtl: false,
+          font: "Inter",
+          size: 20,
+        })),
+        tmpls: generated.cards.map((c, i) => ({
+          name: c.name,
+          ord: i,
+          qfmt: c.qfmt,
+          afmt: c.afmt,
+        })),
+      };
+
+      const newTemplate: TemplateProject = {
+        id: `template-${Date.now()}`,
+        name: generated.name,
+        description: generated.description,
+        baseType,
+        noteType,
+        previewData: generated.previewData || {},
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        isShared: false,
+        tags: [],
+      };
+
+      setUserTemplates((prev) => [...prev, newTemplate]);
+      setSelectedTemplate(newTemplate);
+      setSelectedCardIndex(0);
+      setSelectedTemplateType("qfmt");
+      setShowAIDialog(false);
+    },
+    [apiService]
+  );
+
   if (isLoading) {
     return (
       <div className={styles.app}>
@@ -418,6 +471,7 @@ const TemplateEditor: React.FC = () => {
           const webUrl = import.meta.env.VITE_WEB_URL ?? "https://2anki.net";
           window.open(`${webUrl}/marketplace`, "_blank", "noopener,noreferrer");
         }}
+        onGenerateWithAI={() => setShowAIDialog(true)}
         isCollapsed={isSidebarCollapsed}
         onToggleCollapse={() => setIsSidebarCollapsed((v) => !v)}
       />
@@ -429,9 +483,16 @@ const TemplateEditor: React.FC = () => {
         />
       )}
 
+      {showAIDialog && (
+        <AIGenerateDialog
+          onGenerated={handleAIGenerated}
+          onCancel={() => setShowAIDialog(false)}
+        />
+      )}
+
       <div
         className={styles.mainContent}
-        style={{ marginLeft: isSidebarCollapsed ? "48px" : "260px" }}
+        style={{ marginLeft: isSidebarCollapsed ? "52px" : "280px" }}
       >
         {selectedTemplate ? (
           <>
@@ -626,7 +687,7 @@ const TemplateEditor: React.FC = () => {
               </div>
 
               {/* Template Editor */}
-              <div>
+              <div className={styles.editorSection}>
                 <div className={styles.templateTabs}>
                   {selectedTemplate.noteType.tmpls.map((cardType, index) => (
                     <React.Fragment key={index}>
@@ -694,20 +755,27 @@ const TemplateEditor: React.FC = () => {
           <div className={styles.emptyState}>
             <Icons.Template className={styles.emptyIcon} />
             <h2 className={styles.emptyTitle}>
-              Welcome to 2Anki Templates Editor
+              Create beautiful Anki flashcards
             </h2>
             <p className={styles.emptyDescription}>
-              Create beautiful, customizable Anki flashcard templates with our
-              Notion-inspired editor. Start by creating a new template or
-              exploring shared templates from the community.
+              Design stunning flashcard templates with our editor, or let AI
+              generate one for you in seconds.
             </p>
-            <button
-              className={styles.createButton}
-              onClick={() => setShowNewTemplateDialog(true)}
-            >
-              <Icons.Plus className={styles.actionIcon} />
-              Create Your First Template
-            </button>
+            <div className={styles.emptyActions}>
+              <button
+                className={styles.generateButtonLarge}
+                onClick={() => setShowAIDialog(true)}
+              >
+                ✨ Generate with AI
+              </button>
+              <button
+                className={styles.createButton}
+                onClick={() => setShowNewTemplateDialog(true)}
+              >
+                <Icons.Plus className={styles.actionIcon} />
+                Create from scratch
+              </button>
+            </div>
           </div>
         )}
       </div>

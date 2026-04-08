@@ -249,7 +249,6 @@ class TemplateApiService {
     return response.arrayBuffer();
   }
 
-  // Generate preview HTML
   generatePreview(
     noteType: AnkiNoteType,
     cardIndex: number,
@@ -259,23 +258,148 @@ class TemplateApiService {
     const cardType = noteType.tmpls[cardIndex];
     if (!cardType) return "";
 
-    const template = isBack ? cardType.afmt : cardType.qfmt;
-    let html = template;
+    let html: string;
 
-    // Replace field placeholders with preview data
-    noteType.flds.forEach((field) => {
-      const value = previewData[field.name] || `[${field.name}]`;
-      const regex = new RegExp(`{{${field.name}}}`, "gi");
-      html = html.replace(regex, value);
-    });
+    if (isBack) {
+      const frontHtml = this.renderTemplate(
+        cardType.qfmt,
+        noteType,
+        previewData,
+        cardIndex
+      );
+      html = this.renderTemplate(
+        cardType.afmt,
+        noteType,
+        previewData,
+        cardIndex,
+        frontHtml
+      );
+    } else {
+      html = this.renderTemplate(
+        cardType.qfmt,
+        noteType,
+        previewData,
+        cardIndex
+      );
+    }
 
-    // Wrap in basic styling
+    const cardClass = `card card${cardIndex + 1}`;
+
     return `
       <style>${noteType.css}</style>
-      <div class="card">
+      <div class="${cardClass}">
         ${html}
       </div>
     `;
+  }
+
+  private renderTemplate(
+    template: string,
+    noteType: AnkiNoteType,
+    previewData: PreviewData,
+    cardIndex: number,
+    frontSideHtml?: string
+  ): string {
+    let html = template;
+
+    if (frontSideHtml !== undefined) {
+      html = html.replace(/{{FrontSide}}/gi, frontSideHtml);
+    }
+
+    html = this.processConditionals(html, noteType, previewData);
+
+    if (noteType.type === 1) {
+      noteType.flds.forEach((field) => {
+        const escaped = this.escapeRegex(field.name);
+        const clozeRegex = new RegExp(`{{cloze:${escaped}}}`, "gi");
+        const value = previewData[field.name] || "";
+        const rendered = value.replace(
+          /{{c(\d+)::([^}]*?)(?:::([^}]*?))?}}/g,
+          (_match, num, answer, hint) => {
+            const clozeNum = parseInt(num, 10);
+            const isActive = clozeNum === cardIndex + 1;
+            if (isActive) {
+              return `<span style="font-weight:bold;color:#0284c7;">[${
+                hint || "..."
+              }]</span>`;
+            }
+            return answer;
+          }
+        );
+        html = html.replace(clozeRegex, rendered);
+      });
+    }
+
+    noteType.flds.forEach((field) => {
+      const escaped = this.escapeRegex(field.name);
+
+      const hintRegex = new RegExp(`{{hint:${escaped}}}`, "gi");
+      const hintValue = previewData[field.name] || "";
+      if (hintValue) {
+        const hintId = `hint_${field.name.replace(/\s/g, "_")}`;
+        html = html.replace(
+          hintRegex,
+          `<a class="hint" href="#" onclick="this.style.display='none';document.getElementById('${hintId}').style.display='inline-block';return false;">Show ${field.name}</a><div id="${hintId}" style="display:none">${hintValue}</div>`
+        );
+      } else {
+        html = html.replace(hintRegex, "");
+      }
+
+      const textRegex = new RegExp(`{{text:${escaped}}}`, "gi");
+      const textValue = previewData[field.name] || `[${field.name}]`;
+      html = html.replace(textRegex, textValue.replace(/<[^>]*>/g, ""));
+
+      const typeRegex = new RegExp(`{{type:${escaped}}}`, "gi");
+      html = html.replace(
+        typeRegex,
+        `<input type="text" placeholder="type answer here" style="font-family:monospace;font-size:14px;padding:4px 8px;border:1px solid #ccc;border-radius:4px;width:80%;max-width:400px;" readonly />`
+      );
+
+      const fieldRegex = new RegExp(`{{${escaped}}}`, "gi");
+      html = html.replace(
+        fieldRegex,
+        previewData[field.name] || `[${field.name}]`
+      );
+    });
+
+    html = html.replace(/{{Tags}}/gi, "preview");
+    html = html.replace(/{{Type}}/gi, noteType.name);
+    html = html.replace(/{{Deck}}/gi, "Preview Deck");
+    html = html.replace(/{{Subdeck}}/gi, "Preview Deck");
+    html = html.replace(
+      /{{Card}}/gi,
+      noteType.tmpls[cardIndex]?.name || "Card 1"
+    );
+    html = html.replace(/{{CardFlag}}/gi, "");
+
+    return html;
+  }
+
+  private escapeRegex(str: string): string {
+    return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  }
+
+  private processConditionals(
+    html: string,
+    noteType: AnkiNoteType,
+    previewData: PreviewData
+  ): string {
+    let result = html;
+    let safety = 0;
+
+    while (safety++ < 50) {
+      const match = result.match(/{{([#^])([^}]+?)}}([\s\S]*?){{\/\2}}/);
+      if (!match) break;
+
+      const [fullMatch, operator, fieldName, content] = match;
+      const fieldValue = (previewData[fieldName] || "").trim();
+      const hasValue = fieldValue.length > 0;
+
+      const shouldShow = operator === "#" ? hasValue : !hasValue;
+      result = result.replace(fullMatch, shouldShow ? content : "");
+    }
+
+    return result;
   }
 
   // Get default note types

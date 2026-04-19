@@ -10,8 +10,6 @@ import { validateTemplate } from "../../lib/validateTemplate";
 import Sidebar from "../Sidebar/Sidebar";
 import MonacoEditorWrapper from "../MonacoEditorWrapper/MonacoEditorWrapper";
 import NewTemplateDialog from "../NewTemplateDialog/NewTemplateDialog";
-import AIGenerateDialog from "../AIGenerateDialog/AIGenerateDialog";
-import type { GeneratedTemplate } from "../AIGenerateDialog/AIGenerateDialog";
 import styles from "./TemplateEditor.module.css";
 
 // Icons
@@ -63,7 +61,6 @@ const TemplateEditor: React.FC = () => {
   const [isEditingDescription, setIsEditingDescription] = useState(false);
   const [tempDescription, setTempDescription] = useState("");
   const [showNewTemplateDialog, setShowNewTemplateDialog] = useState(false);
-  const [showAIDialog, setShowAIDialog] = useState(false);
   const [exportErrors, setExportErrors] = useState<string[]>([]);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isFieldsExpanded, setIsFieldsExpanded] = useState(true);
@@ -403,56 +400,6 @@ const TemplateEditor: React.FC = () => {
     }
   }, [selectedTemplate, apiService]);
 
-  const handleAIGenerated = useCallback(
-    (generated: GeneratedTemplate) => {
-      const baseType =
-        generated.baseType === "cloze"
-          ? NoteBaseType.Cloze
-          : NoteBaseType.Basic;
-      const baseNoteType = apiService.getNoteTypeForBaseType(baseType);
-
-      const noteType: AnkiNoteType = {
-        ...baseNoteType,
-        name: generated.name,
-        css: generated.css,
-        flds: generated.fields.map((f, i) => ({
-          name: f.name,
-          ord: i,
-          sticky: false,
-          rtl: false,
-          font: "Inter",
-          size: 20,
-        })),
-        tmpls: generated.cards.map((c, i) => ({
-          name: c.name,
-          ord: i,
-          qfmt: c.qfmt,
-          afmt: c.afmt,
-        })),
-      };
-
-      const newTemplate: TemplateProject = {
-        id: `template-${Date.now()}`,
-        name: generated.name,
-        description: generated.description,
-        baseType,
-        noteType,
-        previewData: generated.previewData || {},
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        isShared: false,
-        tags: [],
-      };
-
-      setUserTemplates((prev) => [...prev, newTemplate]);
-      setSelectedTemplate(newTemplate);
-      setSelectedCardIndex(0);
-      setSelectedTemplateType("qfmt");
-      setShowAIDialog(false);
-    },
-    [apiService]
-  );
-
   if (isLoading) {
     return (
       <div className={styles.app}>
@@ -473,11 +420,6 @@ const TemplateEditor: React.FC = () => {
         onSelectTemplate={handleSelectTemplate}
         onCreateNew={() => setShowNewTemplateDialog(true)}
         onDeleteTemplate={handleDeleteTemplate}
-        onOpenMarketplace={() => {
-          const webUrl = import.meta.env.VITE_WEB_URL ?? "https://2anki.net";
-          window.open(`${webUrl}/marketplace`, "_blank", "noopener,noreferrer");
-        }}
-        onGenerateWithAI={() => setShowAIDialog(true)}
         isCollapsed={isSidebarCollapsed}
         onToggleCollapse={() => setIsSidebarCollapsed((v) => !v)}
       />
@@ -486,13 +428,6 @@ const TemplateEditor: React.FC = () => {
         <NewTemplateDialog
           onSelect={createNewTemplate}
           onCancel={() => setShowNewTemplateDialog(false)}
-        />
-      )}
-
-      {showAIDialog && (
-        <AIGenerateDialog
-          onGenerated={handleAIGenerated}
-          onCancel={() => setShowAIDialog(false)}
         />
       )}
 
@@ -764,16 +699,9 @@ const TemplateEditor: React.FC = () => {
               Create beautiful Anki flashcards
             </h2>
             <p className={styles.emptyDescription}>
-              Design stunning flashcard templates with our editor, or let AI
-              generate one for you in seconds.
+              Design stunning flashcard templates with our editor.
             </p>
             <div className={styles.emptyActions}>
-              <button
-                className={styles.generateButtonLarge}
-                onClick={() => setShowAIDialog(true)}
-              >
-                ✨ Generate with AI
-              </button>
               <button
                 className={styles.createButton}
                 onClick={() => setShowNewTemplateDialog(true)}

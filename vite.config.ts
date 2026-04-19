@@ -28,7 +28,7 @@ export default defineConfig({
     sourcemap: false,
   },
   server: {
-    port: 3000,
+    port: 3001,
     open: true,
     proxy: {
       "/api": "http://localhost:2020",

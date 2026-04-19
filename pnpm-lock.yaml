@@ -43,8 +43,8 @@ importers:
         specifier: ^6.9.1
         version: 6.9.1
       '@types/lodash':
-        specifier: ^4.14.191
-        version: 4.14.191
+        specifier: ^4.17.24
+        version: 4.17.24
       '@types/node':
         specifier: ^25.6.0
         version: 25.6.0
@@ -563,8 +563,8 @@ packages:
     peerDependencies:
       '@types/react': '*'
 
-  '@types/lodash@4.14.191':
-    resolution: {integrity: sha512-BdZ5BCCvho3EIXw6wUCXHe7rS53AIDPLE+JzwgT+OsJk53oBfbSmZZ7CX4VaRoN78N+TJpFi9QPlfIVNmJYWxQ==}
+  '@types/lodash@4.17.24':
+    resolution: {integrity: sha512-gIW7lQLZbue7lRSWEFql49QJJWThrTFFeIMJdp3eH4tKoxm1OvEPg02rm4wCCSHS0cL3/Fizimb35b7k8atwsQ==}
 
   '@types/node@25.6.0':
     resolution: {integrity: sha512-+qIYRKdNYJwY3vRCZMdJbPLJAtGjQBudzZzdzwQYkEPQd+PJGixUL5QfvCLDaULoLv+RhT3LDkwEfKaAkgSmNQ==}
@@ -1756,7 +1756,7 @@ snapshots:
       '@types/react': 18.3.27
       hoist-non-react-statics: 3.3.2
 
-  '@types/lodash@4.14.191': {}
+  '@types/lodash@4.17.24': {}
 
   '@types/node@25.6.0':
     dependencies:

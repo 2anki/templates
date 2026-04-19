@@ -39,7 +39,7 @@
     "@types/node": "^25.6.0",
     "@types/react": "^18.3.27",
     "@types/react-dom": "18.3.7",
-    "@vitejs/plugin-react": "^4.7.0",
+    "@vitejs/plugin-react": "^5.2.0",
     "@vitest/ui": "^3.2.4",
     "husky": "^9.1.7",
     "jsdom": "^27.0.0",

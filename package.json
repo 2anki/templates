@@ -1,6 +1,6 @@
 {
   "name": "templates.2anki.net",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "private": true,
   "dependencies": {
     "@monaco-editor/react": "^4.6.0",

@@ -13,7 +13,7 @@ importers:
     dependencies:
       '@monaco-editor/react':
         specifier: ^4.6.0
-        version: 4.7.0(monaco-editor@0.54.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 4.7.0(monaco-editor@0.55.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@testing-library/react':
         specifier: ^15.0.7
         version: 15.0.7(@types/react@18.3.27)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -21,8 +21,8 @@ importers:
         specifier: ^4.17.23
         version: 4.18.1
       monaco-editor:
-        specifier: ^0.54.0
-        version: 0.54.0
+        specifier: ^0.55.1
+        version: 0.55.1
       react:
         specifier: 18.3.1
         version: 18.3.1
@@ -77,7 +77,7 @@ importers:
         version: 7.1.12(@types/node@25.6.0)
       vite-plugin-monaco-editor:
         specifier: ^1.1.0
-        version: 1.1.0(monaco-editor@0.54.0)
+        version: 1.1.0(monaco-editor@0.55.1)
       vitest:
         specifier: ^3.2.4
         version: 3.2.4(@types/node@25.6.0)(@vitest/ui@3.2.4)(jsdom@27.0.0(postcss@8.5.6))
@@ -728,8 +728,8 @@ packages:
   dom-accessibility-api@0.6.3:
     resolution: {integrity: sha512-7ZgogeTnjuHbo+ct10G9Ffp0mif17idi0IyWNVA/wcwcm7NPOD/WEHVP3n7n3MhXqxoIYm8d6MuZohYWIZ4T3w==}
 
-  dompurify@3.3.3:
-    resolution: {integrity: sha512-Oj6pzI2+RqBfFG+qOaOLbFXLQ90ARpcGG6UePL82bJLtdsa6CYJD7nmiU8MW9nQNOtCHV3lZ/Bzq1X0QYbBZCA==}
+  dompurify@3.4.0:
+    resolution: {integrity: sha512-nolgK9JcaUXMSmW+j1yaSvaEaoXYHwWyGJlkoCTghc97KgGDDSnpoU/PlEnw63Ah+TGKFOyY+X5LnxaWbCSfXg==}
 
   electron-to-chromium@1.5.234:
     resolution: {integrity: sha512-RXfEp2x+VRYn8jbKfQlRImzoJU01kyDvVPBmG39eU2iuRVhuS6vQNocB8J0/8GrIMLnPzgz4eW6WiRnJkTuNWg==}
@@ -914,8 +914,8 @@ packages:
     resolution: {integrity: sha512-I9jwMn07Sy/IwOj3zVkVik2JTvgpaykDZEigL6Rx6N9LbMywwUSMtxET+7lVoDLLd3O3IXwJwvuuns8UB/HeAg==}
     engines: {node: '>=4'}
 
-  monaco-editor@0.54.0:
-    resolution: {integrity: sha512-hx45SEUoLatgWxHKCmlLJH81xBo0uXP4sRkESUpmDQevfi+e7K1VuiSprK6UpQ8u4zOcKNiH0pMvHvlMWA/4cw==}
+  monaco-editor@0.55.1:
+    resolution: {integrity: sha512-jz4x+TJNFHwHtwuV9vA9rMujcZRb0CEilTEwG2rRSpe/A7Jdkuj8xPKttCgOh+v/lkHy7HsZ64oj+q3xoAFl9A==}
 
   mri@1.2.0:
     resolution: {integrity: sha512-tzzskb3bG8LvYGFF/mDTpq3jpI6Q9wc3LEmBaghu+DdCssd1FakN7Bc0hVNmEyGq1bq3RgfkCb3cmQLpNPOroA==}
@@ -1613,10 +1613,10 @@ snapshots:
     dependencies:
       state-local: 1.0.7
 
-  '@monaco-editor/react@4.7.0(monaco-editor@0.54.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@monaco-editor/react@4.7.0(monaco-editor@0.55.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@monaco-editor/loader': 1.5.0
-      monaco-editor: 0.54.0
+      monaco-editor: 0.55.1
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
@@ -1929,7 +1929,7 @@ snapshots:
 
   dom-accessibility-api@0.6.3: {}
 
-  dompurify@3.3.3:
+  dompurify@3.4.0:
     optionalDependencies:
       '@types/trusted-types': 2.0.7
 
@@ -2124,9 +2124,9 @@ snapshots:
 
   min-indent@1.0.1: {}
 
-  monaco-editor@0.54.0:
+  monaco-editor@0.55.1:
     dependencies:
-      dompurify: 3.3.3
+      dompurify: 3.4.0
       marked: 14.0.0
 
   mri@1.2.0: {}
@@ -2389,9 +2389,9 @@ snapshots:
       - tsx
       - yaml
 
-  vite-plugin-monaco-editor@1.1.0(monaco-editor@0.54.0):
+  vite-plugin-monaco-editor@1.1.0(monaco-editor@0.55.1):
     dependencies:
-      monaco-editor: 0.54.0
+      monaco-editor: 0.55.1
 
   vite@6.3.6(@types/node@25.6.0):
     dependencies:

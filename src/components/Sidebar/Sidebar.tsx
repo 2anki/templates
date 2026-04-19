@@ -79,8 +79,6 @@ interface SidebarProps {
   onSelectTemplate: (template: TemplateProject) => void;
   onCreateNew: () => void;
   onDeleteTemplate: (templateId: string) => void;
-  onOpenMarketplace: () => void;
-  onGenerateWithAI: () => void;
   isCollapsed: boolean;
   onToggleCollapse: () => void;
 }
@@ -92,8 +90,6 @@ const Sidebar: React.FC<SidebarProps> = ({
   onSelectTemplate,
   onCreateNew,
   onDeleteTemplate,
-  onOpenMarketplace,
-  onGenerateWithAI,
   isCollapsed,
   onToggleCollapse,
 }) => {
@@ -164,14 +160,6 @@ const Sidebar: React.FC<SidebarProps> = ({
       {!isCollapsed && (
         <>
           <div className={styles.sidebarContent}>
-            <button
-              className={styles.generateButton}
-              onClick={onGenerateWithAI}
-            >
-              <span className={styles.generateIcon}>✨</span>
-              Generate with AI
-            </button>
-
             {/* Search */}
             <div className={styles.searchContainer}>
               <input
@@ -276,7 +264,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                   <Icons.Share className={styles.emptyIcon} />
                   <div className={styles.emptyTitle}>No shared templates</div>
                   <div className={styles.emptyDescription}>
-                    Browse the marketplace or share your own
+                    Share a template with a colleague to see it here
                   </div>
                 </div>
               ) : (
@@ -325,13 +313,6 @@ const Sidebar: React.FC<SidebarProps> = ({
                 </ul>
               )}
             </div>
-          </div>
-
-          <div className={styles.sidebarFooter}>
-            <button className={styles.footerButton} onClick={onOpenMarketplace}>
-              <Icons.Store className={styles.itemIcon} />
-              Marketplace
-            </button>
           </div>
         </>
       )}
